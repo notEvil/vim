@@ -39,7 +39,6 @@ endif
 " == colors
 colorscheme wombat
 set background=dark
-highlight Search guibg=Orange2
 " == font
 if has("gui_running")
   if has("gui_win32")
@@ -88,6 +87,8 @@ nmap / /\v
 vmap / /\v
 " == search
 nmap // :nohlsearch<cr>
+set hlsearch
+highlight Search guibg=Orange2
 
 
 " = indent
@@ -117,6 +118,10 @@ let g:airline_powerline_fonts=1
 " = ctrlp
 NeoBundle 'kien/ctrlp.vim'
 let g:ctrlp_cmd = 'CtrlPMixed'
+let g:ctrlp_custom_ignore = {
+	    \ 'dir': '\v[\/]\.'
+	    \ }
+let g:ctrlp_follow_symlinks = 0
 
 " = nerdtree
 NeoBundle 'scrooloose/nerdtree'
@@ -127,6 +132,14 @@ NeoBundle 'Valloric/YouCompleteMe'
 
 " = python-mode
 NeoBundle 'klen/python-mode'
+
+" = startify
+NeoBundle 'mhinz/vim-startify'
+let g:startify_session_dir = '~/.vim/sessions'
+let g:startify_cumstom_indices = ['u', 'i', 'o', 'p']
+let g:startify_session_persistence = 1
+let g:startify_bookmarks = [ '~/.vimrc' ]
+map <leader>s :Startify<cr>
 
 
 " = neobundle
