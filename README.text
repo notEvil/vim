@@ -1,0 +1,39 @@
+# Push some code around in Bitbucket
+
+You can use this tutorial repo to push code right from your browser.  Read through
+the following instructions. Then, give it a try for yourself.
+
+1. Press the **Source** option on this page.
+
+	You'll see a list of the repo's source files. 
+
+2. Click on the `sample.html` file.
+
+	Bitbucket shows you the file's contents.
+	
+3. Press the **Edit** button in the file's panel.
+
+	The **Online Editor** opens. 
+	 
+4. Change the heading from `My First File` to `Kick over the bucket`.
+
+5. Press **Commit**.
+
+	Bitbucket prompts you to enter a commit message.  It also supplies you with a default message.
+	 
+6. Add your name or some other text to the message.
+
+7. Press **Commit**.
+ 
+	Bitbucket commits your changes and returns you to the **Commits** view. 
+	 
+8. Review your commit.
+
+	The green line is your edit. The red line shows your change. 
+	 
+9. Try and view a **Side-by-side** diff.
+
+ 
+Congratulations, you've committed a code change on Bitbucket!
+
+You can also commit code changes via the command line. Make sure you have [git installed](https://confluence.atlassian.com/display/BITBUCKET/Set+up+Git+and+Mercurial), then start by pressing the **Clone** button above. If you're unfamiliar with git, check out the [documentation](https://confluence.atlassian.com/display/BITBUCKET/Clone+Your+Git+Repo+and+Add+Source+Files) to learn how!
