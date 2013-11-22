@@ -26,7 +26,7 @@ set nowrap
 "source $VIMRUNTIME/mswin.vim
 "behave mswin
 
-set backspace=indent,eol,start
+"set backspace=indent,eol,start " not very vi like
 
 " - gui
 set guioptions-=T " remove toolbar
@@ -34,6 +34,8 @@ set guioptions-=m " remove menu
 set guioptions-=r " remove right scrollbar
 set guioptions-=L " remove left scrollbar
 set guioptions-=b " remove bottom scrollbar
+
+
 if has("gui_running") && has("gui_win32") " in gvim, on windows
     aug _maximize
 	au!
@@ -49,7 +51,7 @@ set background=dark
 " - font
 if has("gui_running")
   if has("gui_win32")
-    set guifont=Consolas:h11
+    set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
   else
     set guifont=Inconsolata\ 12
   endif
@@ -93,7 +95,7 @@ endfunction
 
 aug _colorLineNr
     au!
-    au CursorMoved * call OnCursorMoved1()
+    au CursorMoved call OnCursorMoved1()
 aug END
 
 hi CursorLineNr guifg=#000000
@@ -113,9 +115,9 @@ nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
 nnoremap <right> <c-w>>
 " - tabs
-noremap <c-h> :tabprevious<CR>
-noremap <c-l> :tabnext<CR>
-noremap <c-t> :tabnew<CR>
+noremap <c-h> :tabprevious<cr>
+noremap <c-l> :tabnext<cr>
+noremap <c-t> :tabnew<cr>
 " - navigation
 nnoremap <space> <c-d>
 vnoremap <space> <c-d>
@@ -132,6 +134,7 @@ inoremap jk <cr>
 " . save
 nnoremap <a-s> :update<cr>
 inoremap <a-s> <esc>:update<cr>a
+vnoremap <a-s> <esc>:update<cr>gv
 " - regex
 nnoremap / /\v
 vnoremap / /\v
@@ -146,12 +149,16 @@ inoremap <c-h> <bs>
 inoremap <c-l> <del>
 " - run
 "map <leader>rp :exe ":ConqueTermVSplit C:\\Python27\\python.exe -i " . expand("%")
-" - copy paste
-noremap <c-c> "+y
-noremap <c-v> "+P
-inoremap <c-v> <esc>l"+Pli
-nnoremap P p
-nnoremap p P
+" - copy paste (just try it out)
+vnoremap <c-c> "+ygv
+nnoremap <c-v> "+Pl
+inoremap <c-v> <esc>"+pa
+vnoremap <c-v> d"+Pl
+nnoremap P pl
+nnoremap p Pl
+" - in/dedent
+vnoremap < <gv
+vnoremap > >gv
 
 " = indent
 set softtabstop=4
@@ -240,23 +247,24 @@ let g:startify_session_persistence = 1
 let g:startify_bookmarks = [ '~/.vimrc' ]
 noremap <leader>s :Startify<cr>
 
-" = utisnips
-NeoBundle 'UltiSnips'
-
-" = syntastic
-NeoBundle 'scrooloose/syntastic'
-
 " = NERDcommenter
 NeoBundle 'scrooloose/nerdcommenter'
 
-" = Conque-Shell
-NeoBundle 'vim-scripts/Conque-Shell'
-
-" = pyclewn
-NeoBundle 'xieyu/pyclewn'
-
 " = sneak
 NeoBundle 'justinmk/vim-sneak'
+
+"" = utisnips
+"NeoBundle 'UltiSnips'
+
+"" = syntastic
+"NeoBundle 'scrooloose/syntastic'
+
+"" = Conque-Shell
+"NeoBundle 'vim-scripts/Conque-Shell'
+
+"" = pyclewn
+"NeoBundle 'xieyu/pyclewn'
+
 
 
 " = neobundle
