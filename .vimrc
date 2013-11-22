@@ -221,8 +221,10 @@ let g:airline_powerline_fonts=1
 NeoBundle 'kien/ctrlp.vim'
 let g:ctrlp_cmd = 'CtrlPMixed'
 let g:ctrlp_custom_ignore = {
-\ 'dir': '\v[\/]\.'
-\ }
+  \ 'dir':  '\v[\/]\.',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
+  \ }
 let g:ctrlp_follow_symlinks = 0
 
 " = nerdtree
