@@ -95,7 +95,7 @@ endfunction
 
 aug _colorLineNr
     au!
-    au CursorMoved call OnCursorMoved1()
+    au CursorMoved * call OnCursorMoved1()
 aug END
 
 hi CursorLineNr guifg=#000000
