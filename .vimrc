@@ -18,8 +18,6 @@ set sessionoptions-=options " do not restore temporary options
 set encoding=utf-8
 syntax on
 set nowrap
-" may cause more trouble than help
-"set autochdir " auto change current directory to file parent
 
 " probably necessary
 "source $VIMRUNTIME/vimrc_example.vim
@@ -60,45 +58,45 @@ endif
 function Interpolate(p, fro, to)
     return a:fro + a:p * (a:to - a:fro)
 endfunction
-function OnCursorMoved1()
+function ColoredLineNumbers()
     let endLNr = line('$')
     if endLNr == 1
-        let endLNr = 2
+	let endLNr = 2
     endif
-
-    let colors = [[255, 255, 255],
-                \ [235, 235, 54],
-                \ [121, 219, 50],
-                \ [54, 123, 235],
-                \ [0, 0, 0]]
-    let fg_colors = ['black', '#005f00', 'white']
-
     let p = (line('.') - 1) * 1.0 / (endLNr - 1)
 
-    let fg_color_index = float2nr(p * len(fg_colors) - 0.001)
-    let fg_color = fg_colors[fg_color_index]
+    let colors = [[255, 0, 0],
+		\ [0, 255, 0],
+		\ [0, 0, 255]]
+    let step = 1.0 / (len(colors) - 1)
+    let index = 0
+    let p2 = p
+    while step < p2
+	let p2 -= step
+	let index += 1
+    endwhile
+    let p2 = p2 * 2
 
-    let color_index_from = float2nr(p * (len(colors) - 1) - 0.001)
-    let color_index_to = color_index_from + 1
-    let p2 = (p * (len(colors) - 1)) - color_index_from
-
-    let color_from = colors[color_index_from]
-    let color_to = colors[color_index_to]
-
+    let color_from = colors[index]
+    let color_to = colors[index + 1]
     let r = float2nr( Interpolate(p2, color_from[0], color_to[0]) )
     let g = float2nr( Interpolate(p2, color_from[1], color_to[1]) )
     let b = float2nr( Interpolate(p2, color_from[2], color_to[2]) )
+    let bg_c = printf('%02x%02x%02x', r, g, b)
 
-    let c = printf('%02x%02x%02x', r, g, b)
-    exe('hi CursorLineNr guibg=#'.c.' guifg='.fg_color)
+    if p <= 0.1 || 0.9 <= p
+	let fg_c = 'white'
+    else
+	let fg_c = 'black'
+    endif
+
+    exe('hi CursorLineNr guibg=#'.bg_c.' guifg='.fg_c)
 endfunction
 
 aug _colorLineNr
     au!
-    au CursorMoved * call OnCursorMoved1()
+    au CursorMoved * call ColoredLineNumbers()
 aug END
-
-hi CursorLineNr guifg=#000000
 
 
 " = key mappings
@@ -123,6 +121,8 @@ nnoremap <space> <c-d>
 vnoremap <space> <c-d>
 nnoremap <s-space> <c-u>
 vnoremap <s-space> <c-u>
+nnoremap <c-i> <c-o>
+nnoremap <c-o> <c-i>
 " - shortcuts
 " . esc
 inoremap fd <esc>
@@ -138,8 +138,16 @@ vnoremap <a-s> <esc>:update<cr>gv
 " - regex
 nnoremap / /\v
 vnoremap / /\v
+nnoremap ? ?\v
+vnoremap ? ?\v
 nnoremap R :%s//
 nnoremap // :nohlsearch<cr>
+nnoremap # *
+vnoremap # *
+nnoremap + #
+vnoremap + #
+nnoremap <F3> *
+vnoremap <C-F3> #
 " - insert mode
 inoremap <a-h> <left>
 inoremap <a-j> <down>
@@ -176,6 +184,9 @@ set incsearch
 set number
 set relativenumber
 
+" = add filetypes
+au BufNewFile,BufRead *.i set filetype=swig 
+au BufNewFile,BufRead *.swg set filetype=swig 
 
 
 
@@ -240,6 +251,8 @@ NeoBundle 'klen/python-mode'
 let g:pymode_lint_write = 0
 let g:pymode_run_key = '<leader>rp'
 let g:pymode_folding = 0
+nnoremap äm pymode#motion#move('^\(class\|def\)\s', '')
+nnoremap ÄM pymode#motion#move('^\(class\|def\)\s', 'b')
 
 " = startify
 NeoBundle 'mhinz/vim-startify'
@@ -254,6 +267,8 @@ NeoBundle 'scrooloose/nerdcommenter'
 
 " = sneak
 NeoBundle 'justinmk/vim-sneak'
+let g:sneak#use_ic_scs = 1 " smartcase
+let g:sneak#streak = 1
 
 "" = utisnips
 "NeoBundle 'UltiSnips'
