@@ -172,6 +172,9 @@ vnoremap > >gv
 set softtabstop=4
 set shiftwidth=4
 set autoindent
+" = folds
+set foldmethod=indent
+set foldnestmax=2
 
 " = search
 set hlsearch
