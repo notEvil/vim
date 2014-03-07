@@ -273,15 +273,15 @@ let g:pymode_lint_on_write = 0
 let g:pymode_rope_completion = 0
 let g:pymode_run_key = ''
 let g:pymode_folding = 0
-let g:pymode_rope_rename_bind = '<leader>r'
-let g:pymode_rope_rename_module_bind = '<leader>R'
-let g:pymode_rope_extract_method_bind = '<leader>t'
-let g:pymode_rope_extract_variable_bind = '<leader>T'
-let g:pymode_rope_use_function_bind = '<leader>z'
-let g:pymode_rope_change_signature_bind = '<leader>Z'
-au FileType python nnoremap <c-u> :PymodeRopeUndo
-au FileType python nnoremap <c-u> :PymodeRopeRedo
-au FileType python nnoremap <c-j> :call pymode#motion#move('^\(class\|def\)\s', '')<cr>
+"let g:pymode_rope_rename_bind = '<leader>r'
+"let g:pymode_rope_rename_module_bind = '<leader>R'
+"let g:pymode_rope_extract_method_bind = '<leader>t'
+"let g:pymode_rope_extract_variable_bind = '<leader>T'
+"let g:pymode_rope_use_function_bind = '<leader>z'
+"let g:pymode_rope_change_signature_bind = '<leader>Z'
+"au FileType python nnoremap <c-u> :PymodeRopeUndo
+"au FileType python nnoremap <c-u> :PymodeRopeRedo
+"au FileType python nnoremap <c-j> :call pymode#motion#move('^\(class\|def\)\s', '')<cr>
 "au FileType python nnoremap <c-j> :call pymode#motion#move('^\(class\|def\)\s', '')<cr>
 "au FileType python nmap <c-k> [[
 "au FileType python vmap <c-j> ]]
@@ -315,6 +315,13 @@ let g:sneak#streak = 1
 "" = pyclewn
 "NeoBundle 'xieyu/pyclewn'
 
+" jedi
+NeoBundle 'davidhalter/jedi-vim'
+let g:jedi#auto_initialization = 0
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+au FileType python nnoremap <leader>rr :call jedi#rename()<cr>
+au FileType python nnoremap <leader>hu :call jedi#usages()<cr>
 
 
 " = neobundle
