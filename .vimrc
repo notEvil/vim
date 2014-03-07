@@ -51,7 +51,7 @@ if has("gui_running")
   if has("gui_win32")
     set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
   else
-    set guifont=Inconsolata\ 12
+    set guifont=Inconsolata\ 13
   endif
 endif
 " - colored line number bg
@@ -174,6 +174,7 @@ set shiftwidth=4
 set autoindent
 " = folds
 set foldmethod=indent
+set foldlevelstart=1 
 set foldnestmax=2
 
 " = search
@@ -229,7 +230,8 @@ NeoBundle 'bling/vim-airline'
 set laststatus=2
 set noshowmode
 let g:airline#extensions#tabline#enabled = 1
-let g:airline_powerline_fonts=1
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
 
 " = ctrlp
 NeoBundle 'kien/ctrlp.vim'
