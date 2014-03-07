@@ -102,20 +102,24 @@ aug END
 " = key mappings
 let mapleader="ö"
 " - buffers
-noremap <a-q> :q<cr>
-noremap <a-Q> :wq<cr>
-nnoremap <a-h> <c-w>h
-nnoremap <a-j> <c-w>j
-nnoremap <a-k> <c-w>k
-nnoremap <a-l> <c-w>l
+noremap <c-q> :q<cr>
+nnoremap <a-j> <c-e>
+nnoremap <a-k> <c-y>
+nnoremap <a-h> zh
+nnoremap <a-l> zl
+nnoremap <c-h> <c-w>h
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-l> <c-w>l
 nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
 nnoremap <right> <c-w>>
 " - tabs
-noremap <c-h> :tabprevious<cr>
-noremap <c-l> :tabnext<cr>
 noremap <c-t> :tabnew<cr>
+nnoremap <c-f4> :tabclose<cr>
+noremap <c-tab> :tabnext<cr>
+nnoremap <c-s-tab> :tabprevious<cr>
 " - navigation
 nnoremap <space> <c-d>
 vnoremap <space> <c-d>
@@ -155,15 +159,27 @@ inoremap <a-k> <up>
 inoremap <a-l> <right>
 inoremap <c-h> <bs>
 inoremap <c-l> <del>
+" - visual mode
+nnoremap vv <c-v>
 " - run
 "map <leader>rp :exe ":ConqueTermVSplit C:\\Python27\\python.exe -i " . expand("%")
-" - copy paste (just try it out)
+" - copy paste
+" insert before cursor, cursor moves to the end
+nnoremap p gP
+" insert at the end of line, cursor moves to the entry point of the insertion
+nnoremap P $p`[
+" copy to clipboard, stay in visual mode
 vnoremap <c-c> "+ygv
-nnoremap <c-v> "+Pl
-inoremap <c-v> <esc>"+pa
-vnoremap <c-v> d"+Pl
-nnoremap P pl
-nnoremap p Pl
+" move to clipboard
+vnoremap <c-x> "+ygvd
+" insert clipboard and move to the end
+nnoremap <c-v> "+gP
+" insert clipboard at the end of line, cursor moves to the entry point of the insertion
+"nnoremap <c-s-v> $"+p`[
+" insert clipboard, move to the end, stay in insert mode
+inoremap <c-v> <esc>"+gpi
+" replace selection, move to the end
+vnoremap <c-v> d"+gP
 " - in/dedent
 vnoremap < <gv
 vnoremap > >gv
@@ -174,6 +190,7 @@ set shiftwidth=4
 set autoindent
 " = folds
 set foldmethod=indent
+set foldlevelstart=1
 set foldnestmax=2
 
 " = search
@@ -230,6 +247,7 @@ set laststatus=2
 set noshowmode
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts=1
+let g:airline_theme="powerlineish"
 
 " = ctrlp
 NeoBundle 'kien/ctrlp.vim'
@@ -251,11 +269,23 @@ noremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
-let g:pymode_lint_write = 0
-let g:pymode_run_key = '<leader>rp'
+let g:pymode_lint_on_write = 0
+let g:pymode_rope_completion = 0
+let g:pymode_run_key = ''
 let g:pymode_folding = 0
-nnoremap äm pymode#motion#move('^\(class\|def\)\s', '')
-nnoremap ÄM pymode#motion#move('^\(class\|def\)\s', 'b')
+let g:pymode_rope_rename_bind = '<leader>r'
+let g:pymode_rope_rename_module_bind = '<leader>R'
+let g:pymode_rope_extract_method_bind = '<leader>t'
+let g:pymode_rope_extract_variable_bind = '<leader>T'
+let g:pymode_rope_use_function_bind = '<leader>z'
+let g:pymode_rope_change_signature_bind = '<leader>Z'
+au FileType python nnoremap <c-u> :PymodeRopeUndo
+au FileType python nnoremap <c-u> :PymodeRopeRedo
+au FileType python nnoremap <c-j> :call pymode#motion#move('^\(class\|def\)\s', '')<cr>
+"au FileType python nnoremap <c-j> :call pymode#motion#move('^\(class\|def\)\s', '')<cr>
+"au FileType python nmap <c-k> [[
+"au FileType python vmap <c-j> ]]
+"au FileType python vmap <c-k> [[
 
 " = startify
 NeoBundle 'mhinz/vim-startify'
