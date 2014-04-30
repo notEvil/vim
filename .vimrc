@@ -7,7 +7,7 @@ endif
 
 call neobundle#rc(expand('~/.vim/bundle/'))
 
-NeoBundleFetch 'Shougo/neobundle.vim'
+"NeoBundleFetch 'Shougo/neobundle.vim'
 
 
 " = general
@@ -25,6 +25,7 @@ set nowrap
 "behave mswin
 
 "set backspace=indent,eol,start " not very vi like
+set backspace=indent,start
 
 " - gui
 set guioptions-=T " remove toolbar
@@ -100,7 +101,8 @@ aug END
 
 
 " = key mappings
-let mapleader="ö"
+let mapleader=";"
+noremap <Bslash> z
 " - buffers
 noremap <c-q> :q<cr> " see vv
 nnoremap <a-j> <c-e>
@@ -121,6 +123,7 @@ nnoremap <c-f4> :tabclose<cr>
 noremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
 " - navigation
+noremap # ^
 nnoremap <space> <c-d>
 vnoremap <space> <c-d>
 nnoremap <s-space> <c-u>
@@ -146,10 +149,12 @@ nnoremap ? ?\v
 vnoremap ? ?\v
 nnoremap R :%s//
 nnoremap // :nohlsearch<cr>
-nnoremap # *
-vnoremap # *
-nnoremap + #
-vnoremap + #
+nnoremap = *
+vnoremap = *
+nnoremap * <nop>
+vnoremap * <nop>
+nnoremap - #
+vnoremap - #
 nnoremap <F3> *
 vnoremap <C-F3> #
 " - insert mode
@@ -189,6 +194,7 @@ set autoindent
 set foldmethod=indent
 set foldlevelstart=1
 set foldnestmax=2
+nnoremap zM :set foldlevel=1<cr>
 
 " = search
 set hlsearch
@@ -241,8 +247,7 @@ endfunction
 " = startify
 NeoBundle 'mhinz/vim-startify'
 let g:startify_session_dir = '~/.vim/sessions'
-"let g:startify_custom_indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '!', '"', '§', '%', '&', '/', '(', ')', '='] " loops on linux
-"let g:startify_session_persistence = 1 " anoying
+let g:startify_custom_indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '!', '"', '§', '%', '&', '/', '(', ')', '='] " loops on linux
 let g:startify_bookmarks = [ '~/.vimrc' ]
 noremap <leader>s :Startify<cr>
 
@@ -251,10 +256,14 @@ NeoBundle 'bling/vim-airline'
 set laststatus=2
 set noshowmode
 let g:airline#extensions#tabline#enabled = 1
+let g:airline_theme="powerlineish"
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
-"let g:airline_powerline_fonts = 1
-let g:airline_theme = "powerlineish"
+
+" = nerdtree
+NeoBundle 'scrooloose/nerdtree'
+nnoremap <leader>tt :NERDTreeToggle<cr>
+>>>>>>> dff4d5881500bb051478f67ff9a35116239af61a
 
 " = ctrlp
 NeoBundle 'kien/ctrlp.vim'
@@ -266,25 +275,22 @@ let g:ctrlp_custom_ignore = {
   \ }
 let g:ctrlp_follow_symlinks = 0
 
-" = nerdtree
-NeoBundle 'scrooloose/nerdtree'
-nnoremap <leader>t :NERDTreeToggle<cr>
-
 " = ycm
 NeoBundle 'Valloric/YouCompleteMe'
-noremap <leader>jd :YcmCompleter GoToDefinitionElseDeclaration<cr>
+noremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
+
 let g:pymode_lint_on_write = 0
 let g:pymode_rope_completion = 0
 let g:pymode_run_key = ''
 let g:pymode_folding = 0
-"let g:pymode_rope_rename_bind = '<leader>r'
+let g:pymode_rope_rename_bind = '<leader>rr'
 "let g:pymode_rope_rename_module_bind = '<leader>R'
 "let g:pymode_rope_extract_method_bind = '<leader>t'
 "let g:pymode_rope_extract_variable_bind = '<leader>T'
-"let g:pymode_rope_use_function_bind = '<leader>z'
+let g:pymode_rope_use_function_bind = '<leader>hu'
 "let g:pymode_rope_change_signature_bind = '<leader>Z'
 "au FileType python nnoremap <c-u> :PymodeRopeUndo
 "au FileType python nnoremap <c-u> :PymodeRopeRedo
@@ -294,14 +300,6 @@ let g:pymode_folding = 0
 "au FileType python vmap <c-j> ]]
 "au FileType python vmap <c-k> [[
 
-" jedi
-NeoBundle 'davidhalter/jedi-vim'
-"let g:jedi#auto_initialization = 0
-"let g:jedi#auto_vim_configuration = 0
-let g:jedi#completions_enabled = 0
-"let g:jedi#use_tabs_not_buffers = 0
-au FileType python nnoremap <buffer> <leader>rr :call jedi#rename()<cr>
-au FileType python nnoremap <leader>hu :call jedi#usages()<cr>
 
 " = NERDcommenter
 NeoBundle 'scrooloose/nerdcommenter'
@@ -309,7 +307,13 @@ NeoBundle 'scrooloose/nerdcommenter'
 " = sneak
 NeoBundle 'justinmk/vim-sneak'
 let g:sneak#use_ic_scs = 1 " smartcase
-let g:sneak#streak = 1
+
+" = rainbow paranthesis
+NeoBundle 'kien/rainbow_parentheses.vim'
+nnoremap <leader>tr :RainbowParenthesesToggle<cr>
+
+" = surround
+NeoBundle 'tpope/vim-surround'
 
 "" = utisnips
 "NeoBundle 'UltiSnips'
@@ -323,6 +327,13 @@ let g:sneak#streak = 1
 "" = pyclewn
 "NeoBundle 'xieyu/pyclewn'
 
+"" jedi
+"NeoBundle 'davidhalter/jedi-vim'
+"let g:jedi#auto_initialization = 0
+"let g:jedi#completions_enabled = 0
+"let g:jedi#auto_vim_configuration = 0
+"au FileType python nnoremap <leader>rr :call jedi#rename()<cr>
+"au FileType python nnoremap <leader>hu :call jedi#usages()<cr>
 
 
 " = neobundle
