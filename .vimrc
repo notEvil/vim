@@ -102,7 +102,7 @@ aug END
 " = key mappings
 let mapleader="ö"
 " - buffers
-noremap <c-q> :q<cr>
+noremap <c-q> :q<cr> " see vv
 nnoremap <a-j> <c-e>
 nnoremap <a-k> <c-y>
 nnoremap <a-h> zh
@@ -175,14 +175,11 @@ vnoremap <c-x> "+ygvd
 " insert clipboard and move to the end
 nnoremap <c-v> "+gP
 " insert clipboard at the end of line, cursor moves to the entry point of the insertion
-"nnoremap <c-s-v> $"+p`[
+"nnoremap <c-s-v> $"+p`[ " doesnt work because c-s-v is equal to c-v
 " insert clipboard, move to the end, stay in insert mode
 inoremap <c-v> <esc>"+gpi
 " replace selection, move to the end
 vnoremap <c-v> d"+gP
-" - in/dedent
-vnoremap < <gv
-vnoremap > >gv
 
 " = indent
 set softtabstop=4
@@ -190,11 +187,7 @@ set shiftwidth=4
 set autoindent
 " = folds
 set foldmethod=indent
-<<<<<<< HEAD
-set foldlevelstart=1 
-=======
 set foldlevelstart=1
->>>>>>> af715efa711f6e310f505dc6e1041052f8efbab8
 set foldnestmax=2
 
 " = search
@@ -245,6 +238,14 @@ endfunction
 
 
 
+" = startify
+NeoBundle 'mhinz/vim-startify'
+let g:startify_session_dir = '~/.vim/sessions'
+"let g:startify_custom_indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '!', '"', '§', '%', '&', '/', '(', ')', '='] " loops on linux
+"let g:startify_session_persistence = 1 " anoying
+let g:startify_bookmarks = [ '~/.vimrc' ]
+noremap <leader>s :Startify<cr>
+
 " = airline
 NeoBundle 'bling/vim-airline'
 set laststatus=2
@@ -252,7 +253,7 @@ set noshowmode
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
-let g:airline_powerline_fonts = 1
+"let g:airline_powerline_fonts = 1
 let g:airline_theme = "powerlineish"
 
 " = ctrlp
@@ -293,13 +294,14 @@ let g:pymode_folding = 0
 "au FileType python vmap <c-j> ]]
 "au FileType python vmap <c-k> [[
 
-" = startify
-NeoBundle 'mhinz/vim-startify'
-let g:startify_session_dir = '~/.vim/sessions'
-let g:startify_custom_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '!', '"', '§', '%', '&', '/', '(', ')', '=']
-let g:startify_session_persistence = 1
-let g:startify_bookmarks = [ '~/.vimrc' ]
-noremap <leader>s :Startify<cr>
+" jedi
+NeoBundle 'davidhalter/jedi-vim'
+"let g:jedi#auto_initialization = 0
+"let g:jedi#auto_vim_configuration = 0
+let g:jedi#completions_enabled = 0
+"let g:jedi#use_tabs_not_buffers = 0
+au FileType python nnoremap <buffer> <leader>rr :call jedi#rename()<cr>
+au FileType python nnoremap <leader>hu :call jedi#usages()<cr>
 
 " = NERDcommenter
 NeoBundle 'scrooloose/nerdcommenter'
@@ -321,14 +323,8 @@ let g:sneak#streak = 1
 "" = pyclewn
 "NeoBundle 'xieyu/pyclewn'
 
-" jedi
-NeoBundle 'davidhalter/jedi-vim'
-let g:jedi#auto_initialization = 0
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-au FileType python nnoremap <leader>rr :call jedi#rename()<cr>
-au FileType python nnoremap <leader>hu :call jedi#usages()<cr>
 
 
 " = neobundle
 NeoBundleCheck
+
