@@ -7,7 +7,7 @@ endif
 
 call neobundle#rc(expand('~/.vim/bundle/'))
 
-"NeoBundleFetch 'Shougo/neobundle.vim'
+NeoBundleFetch 'Shougo/neobundle.vim'
 
 
 " = general
@@ -247,9 +247,10 @@ endfunction
 " = startify
 NeoBundle 'mhinz/vim-startify'
 let g:startify_session_dir = '~/.vim/sessions'
-let g:startify_custom_indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '!', '"', '§', '%', '&', '/', '(', ')', '='] " loops on linux
+let g:startify_list_order = ['files', 'bookmarks', 'sessions']
+let g:startify_custom_indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'] " loops on linux
 let g:startify_bookmarks = [ '~/.vimrc' ]
-noremap <leader>s :Startify<cr>
+noremap <leader>ss :Startify<cr>
 
 " = airline
 NeoBundle 'bling/vim-airline'
@@ -260,20 +261,12 @@ let g:airline_theme="powerlineish"
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
 
-" = nerdtree
-NeoBundle 'scrooloose/nerdtree'
-nnoremap <leader>tt :NERDTreeToggle<cr>
->>>>>>> dff4d5881500bb051478f67ff9a35116239af61a
-
 " = ctrlp
 NeoBundle 'kien/ctrlp.vim'
+NeoBundle 'tacahiroy/ctrlp-funky'
+let g:ctrlp_extensions = ['funky']
+let g:ctrlp_working_path_mode = 'c'
 let g:ctrlp_cmd = 'CtrlPMixed'
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.',
-  \ 'file': '\v\.(exe|so|dll)$',
-  \ 'link': 'SOME_BAD_SYMBOLIC_LINKS',
-  \ }
-let g:ctrlp_follow_symlinks = 0
 
 " = ycm
 NeoBundle 'Valloric/YouCompleteMe'
@@ -287,6 +280,7 @@ let g:pymode_rope_completion = 0
 let g:pymode_run_key = ''
 let g:pymode_folding = 0
 let g:pymode_rope_rename_bind = '<leader>rr'
+let g:pymode_motion = 0
 "let g:pymode_rope_rename_module_bind = '<leader>R'
 "let g:pymode_rope_extract_method_bind = '<leader>t'
 "let g:pymode_rope_extract_variable_bind = '<leader>T'
@@ -294,8 +288,8 @@ let g:pymode_rope_use_function_bind = '<leader>hu'
 "let g:pymode_rope_change_signature_bind = '<leader>Z'
 "au FileType python nnoremap <c-u> :PymodeRopeUndo
 "au FileType python nnoremap <c-u> :PymodeRopeRedo
-"au FileType python nnoremap <c-j> :call pymode#motion#move('^\(class\|def\)\s', '')<cr>
-"au FileType python nnoremap <c-j> :call pymode#motion#move('^\(class\|def\)\s', '')<cr>
+"au FileType python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
+"au FileType python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
 "au FileType python nmap <c-k> [[
 "au FileType python vmap <c-j> ]]
 "au FileType python vmap <c-k> [[
@@ -307,6 +301,12 @@ NeoBundle 'scrooloose/nerdcommenter'
 " = sneak
 NeoBundle 'justinmk/vim-sneak'
 let g:sneak#use_ic_scs = 1 " smartcase
+let g:sneak#streak = 1
+let g:sneak#s_next = 1
+
+" = clever f
+NeoBundle 'rhysd/clever-f.vim'
+let g:clever_f_chars_match_any_signs = ';'
 
 " = rainbow paranthesis
 NeoBundle 'kien/rainbow_parentheses.vim'
