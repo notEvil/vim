@@ -148,6 +148,7 @@ vnoremap / /\v
 nnoremap ? ?\v
 vnoremap ? ?\v
 nnoremap R :%s//
+vnoremap R :s//
 nnoremap // :nohlsearch<cr>
 nnoremap = *
 vnoremap = *
@@ -190,6 +191,7 @@ vnoremap <c-v> d"+gP
 set softtabstop=4
 set shiftwidth=4
 set autoindent
+inoremap <s-tab> <c-v><tab>
 " = folds
 set foldmethod=indent
 set foldlevelstart=1
