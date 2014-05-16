@@ -1,2 +1,2 @@
-vim74
-vimfiles
+bundle/**
+sessions/**
