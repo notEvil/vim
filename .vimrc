@@ -1,7 +1,7 @@
 set nocompatible " be IMproved
 
-" = neobundle
 if has('vim_starting')
+    set runtimepath+=~/.vim
     set runtimepath+=~/.vim/bundle/neobundle.vim
 endif
 
@@ -122,6 +122,9 @@ noremap <c-t> :tabnew<cr>
 nnoremap <c-f4> :tabclose<cr>
 noremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
+au TabLeave * let g:lasttab = tabpagenr()
+nnoremap <silent> <c-y> :exe "tabn ".g:lasttab<cr>
+vnoremap <silent> <c-y> :exe "tabn ".g:lasttab<cr>
 " - navigation
 noremap # ^
 nnoremap <space> <c-d>
@@ -147,17 +150,14 @@ nnoremap / /\v
 vnoremap / /\v
 nnoremap ? ?\v
 vnoremap ? ?\v
-nnoremap R :%s//
-vnoremap R :s//
+nnoremap R :%s///g<left><left>
+vnoremap R :s///g<left><left>
 nnoremap // :nohlsearch<cr>
-nnoremap = *
-vnoremap = *
-nnoremap * <nop>
-vnoremap * <nop>
-nnoremap - #
-vnoremap - #
-nnoremap <F3> *
-vnoremap <C-F3> #
+noremap - #
+noremap = *
+vnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
+vnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
+
 " - insert mode
 inoremap <a-h> <left>
 inoremap <a-j> <down>
@@ -259,6 +259,7 @@ NeoBundle 'bling/vim-airline'
 set laststatus=2
 set noshowmode
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline_theme="powerlineish"
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
@@ -288,13 +289,13 @@ let g:pymode_motion = 0
 "let g:pymode_rope_extract_variable_bind = '<leader>T'
 let g:pymode_rope_use_function_bind = '<leader>hu'
 "let g:pymode_rope_change_signature_bind = '<leader>Z'
-"au FileType python nnoremap <c-u> :PymodeRopeUndo
-"au FileType python nnoremap <c-u> :PymodeRopeRedo
-"au FileType python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
-"au FileType python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
-"au FileType python nmap <c-k> [[
-"au FileType python vmap <c-j> ]]
-"au FileType python vmap <c-k> [[
+"au Fe python nnoremap <c-u> :PymodeRopeUndo
+"au Fe python nnoremap <c-u> :PymodeRopeRedo
+"au Fe python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
+"au Fe python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
+"au Fe python nmap <c-k> [[
+"au Fe python vmap <c-j> ]]
+"au Fe python vmap <c-k> [[
 
 
 " = NERDcommenter
@@ -334,9 +335,21 @@ NeoBundle 'tpope/vim-surround'
 "let g:jedi#auto_initialization = 0
 "let g:jedi#completions_enabled = 0
 "let g:jedi#auto_vim_configuration = 0
-"au FileType python nnoremap <leader>rr :call jedi#rename()<cr>
-"au FileType python nnoremap <leader>hu :call jedi#usages()<cr>
+"au Fe python nnoremap <leader>rr :call jedi#rename()<cr>
+"au Fe python nnoremap <leader>hu :call jedi#usages()<cr>
 
+" = mark
+NeoBundle 'dusans/Mark--Karkat'
+nmap <leader>1 <Plug>MarkSearchGroup1Next<leader>m2<c-I>
+nmap <leader>2 <Plug>MarkSearchGroup2Next<leader>m2<c-I>
+nmap <leader>3 <Plug>MarkSearchGroup3Next<leader>m2<c-I>
+nmap <leader>4 <Plug>MarkSearchGroup4Next<leader>m2<c-I>
+nmap <leader>5 <Plug>MarkSearchGroup5Next<leader>m2<c-I>
+nmap <leader>6 <Plug>MarkSearchGroup6Next<leader>m2<c-I>
+nmap <leader>7 <Plug>MarkSearchGroup7Next<leader>m2<c-I>
+nmap <leader>8 <Plug>MarkSearchGroup8Next<leader>m2<c-I>
+nmap <leader>9 <Plug>MarkSearchGroup9Next<leader>m2<c-I>
+nmap <leader>M :MarkClear<cr>
 
 " = neobundle
 NeoBundleCheck
