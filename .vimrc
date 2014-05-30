@@ -290,7 +290,7 @@ let g:pymode_rope_use_function_bind = '<leader>hu'
 NeoBundle 'scrooloose/nerdcommenter'
 
 " = sneak
-NeoBundle 'justinmk/vim-sneak'
+NeoBundle 'notEvil/vim-sneak'
 let g:sneak#use_ic_scs = 1 " smartcase
 let g:sneak#s_next = 1
 let g:sneak#s2ws = 2
