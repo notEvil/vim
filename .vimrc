@@ -1,5 +1,4 @@
 set nocompatible " be IMproved
-
 if has('vim_starting')
     set runtimepath+=~/.vim
     set runtimepath+=~/.vim/bundle/neobundle.vim
@@ -31,7 +30,9 @@ set backspace=indent,start
 set guioptions-=T " remove toolbar
 set guioptions-=m " remove menu
 set guioptions-=r " remove right scrollbar
-set guioptions-=L " remove left scrollbar
+set guioptions-=R
+set guioptions-=l " remove left scrollbar
+set guioptions-=L
 set guioptions-=b " remove bottom scrollbar
 
 
@@ -55,31 +56,28 @@ if has("gui_running")
     set guifont=Inconsolata\ 13
   endif
 endif
-" - colored line number bg
-function Interpolate(p, fro, to)
+" - colored line number
+func! Interpolate(p, fro, to)
     return a:fro + a:p * (a:to - a:fro)
-endfunction
-function ColoredLineNumbers()
-    let endLNr = line('$')
-    if endLNr == 1
-	let endLNr = 2
-    endif
-    let p = (line('.') - 1) * 1.0 / (endLNr - 1)
+endf
+func! ColoredLineNumbers()
+    let endLNr = max([2, line('$')]) " avoid div by zero
+    let p = (line('.') - 1.0) / (endLNr - 1)
 
     let colors = [[255, 0, 0],
 		\ [0, 255, 0],
 		\ [0, 0, 255]]
-    let step = 1.0 / (len(colors) - 1)
-    let index = 0
-    let p2 = p
-    while step < p2
-	let p2 -= step
-	let index += 1
-    endwhile
-    let p2 = p2 * 2
+    let end = len(colors) - 1
 
-    let color_from = colors[index]
-    let color_to = colors[index + 1]
+    let i = float2nr(p * end)
+    if i == end
+      let i -= 1
+    endif
+
+    let p2 = p * end - i
+
+    let color_from = colors[i]
+    let color_to = colors[i + 1]
     let r = float2nr( Interpolate(p2, color_from[0], color_to[0]) )
     let g = float2nr( Interpolate(p2, color_from[1], color_to[1]) )
     let b = float2nr( Interpolate(p2, color_from[2], color_to[2]) )
@@ -92,7 +90,7 @@ function ColoredLineNumbers()
     endif
 
     exe('hi CursorLineNr guibg=#'.bg_c.' guifg='.fg_c)
-endfunction
+endf
 
 aug _colorLineNr
     au!
@@ -102,7 +100,6 @@ aug END
 
 " = key mappings
 let mapleader=";"
-noremap <Bslash> z
 " - buffers
 noremap <c-q> :q<cr> " see vv
 nnoremap <a-j> <c-e>
@@ -117,6 +114,10 @@ nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
 nnoremap <right> <c-w>>
+" copy absolute path to clipboard
+nnoremap <silent> <leader>yp :let @+ = expand('%:p')<cr>
+" open from clipboard
+nnoremap <silent> <leader>pp :e <c-R>+<cr>
 " - tabs
 noremap <c-t> :tabnew<cr>
 nnoremap <c-f4> :tabclose<cr>
@@ -273,39 +274,31 @@ let g:ctrlp_cmd = 'CtrlPMixed'
 
 " = ycm
 NeoBundle 'Valloric/YouCompleteMe'
-noremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
+nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
-
 let g:pymode_lint_on_write = 0
 let g:pymode_rope_completion = 0
 let g:pymode_run_key = ''
 let g:pymode_folding = 0
-let g:pymode_rope_rename_bind = '<leader>rr'
 let g:pymode_motion = 0
-"let g:pymode_rope_rename_module_bind = '<leader>R'
-"let g:pymode_rope_extract_method_bind = '<leader>t'
-"let g:pymode_rope_extract_variable_bind = '<leader>T'
+let g:pymode_rope_rename_bind = '<leader>rr'
 let g:pymode_rope_use_function_bind = '<leader>hu'
-"let g:pymode_rope_change_signature_bind = '<leader>Z'
-"au Fe python nnoremap <c-u> :PymodeRopeUndo
-"au Fe python nnoremap <c-u> :PymodeRopeRedo
-"au Fe python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
-"au Fe python nnoremap <c-j> :call pymode#motion#move('(^\\|\s)^\(class\|def\)\s', '')<cr>
-"au Fe python nmap <c-k> [[
-"au Fe python vmap <c-j> ]]
-"au Fe python vmap <c-k> [[
-
 
 " = NERDcommenter
 NeoBundle 'scrooloose/nerdcommenter'
 
 " = sneak
-NeoBundle 'justinmk/vim-sneak'
+NeoBundle 'notEvil/vim-sneak'
 let g:sneak#use_ic_scs = 1 " smartcase
-let g:sneak#streak = 1
 let g:sneak#s_next = 1
+let g:sneak#s2ws = 2
+let g:sneak#dot2any = 1
+nmap s <Plug>(MyStreak)
+xmap s <Plug>(MyStreak)
+omap s <Plug>(MyStreak)
+nmap S <Plug>(SneakStreak)
 
 " = clever f
 NeoBundle 'rhysd/clever-f.vim'
@@ -318,39 +311,13 @@ nnoremap <leader>tr :RainbowParenthesesToggle<cr>
 " = surround
 NeoBundle 'tpope/vim-surround'
 
-"" = utisnips
-"NeoBundle 'UltiSnips'
-
-"" = syntastic
-"NeoBundle 'scrooloose/syntastic'
-
-"" = Conque-Shell
-"NeoBundle 'vim-scripts/Conque-Shell'
-
-"" = pyclewn
-"NeoBundle 'xieyu/pyclewn'
-
-"" jedi
-"NeoBundle 'davidhalter/jedi-vim'
-"let g:jedi#auto_initialization = 0
-"let g:jedi#completions_enabled = 0
-"let g:jedi#auto_vim_configuration = 0
-"au Fe python nnoremap <leader>rr :call jedi#rename()<cr>
-"au Fe python nnoremap <leader>hu :call jedi#usages()<cr>
-
 " = mark
 NeoBundle 'dusans/Mark--Karkat'
-nmap <leader>1 <Plug>MarkSearchGroup1Next<leader>m2<c-I>
-nmap <leader>2 <Plug>MarkSearchGroup2Next<leader>m2<c-I>
-nmap <leader>3 <Plug>MarkSearchGroup3Next<leader>m2<c-I>
-nmap <leader>4 <Plug>MarkSearchGroup4Next<leader>m2<c-I>
-nmap <leader>5 <Plug>MarkSearchGroup5Next<leader>m2<c-I>
-nmap <leader>6 <Plug>MarkSearchGroup6Next<leader>m2<c-I>
-nmap <leader>7 <Plug>MarkSearchGroup7Next<leader>m2<c-I>
-nmap <leader>8 <Plug>MarkSearchGroup8Next<leader>m2<c-I>
-nmap <leader>9 <Plug>MarkSearchGroup9Next<leader>m2<c-I>
-nmap <leader>M :MarkClear<cr>
+nmap <Plug>IgnoreMarkSearchNext <Plug>MarkSearchNext 
+nmap <Plug>IgnoreMarkSearchPrev <Plug>MarkSearchPrev
+let g:mwDirectGroupJumpMappingNum = 0
 
 " = neobundle
 NeoBundleCheck
+
 
