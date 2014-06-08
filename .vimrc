@@ -1,4 +1,5 @@
 set nocompatible " be IMproved
+
 if has('vim_starting')
     set runtimepath+=~/.vim
     set runtimepath+=~/.vim/bundle/neobundle.vim
@@ -218,7 +219,24 @@ set relativenumber
 au BufNewFile,BufRead *.i set filetype=swig 
 au BufNewFile,BufRead *.swg set filetype=swig 
 
+" = open large file
+let g:LargeFileLimit = 1024 * 1024 * 50 " 50 MB
 
+" Protect large files from sourcing and other overhead. Set read only
+if !exists("my_auto_commands_loaded")
+    let my_auto_commands_loaded = 1
+    " noswapfile (save copy of file)
+    " bufhidden=unload (save memory when other file is viewed)
+    " buftype=nowritefile (is read-only)
+    " undolevels=-1 (no undo possible)
+    augroup LargeFile
+        " dont need eventignore+=FileType cuz we set syntax sync minlines, maxlines
+        autocmd BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFileLimit | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | endif
+    augroup END
+endif
+
+" how many lines before/max current line to start syntax highlighting parsing
+autocmd Syntax * syn sync clear | syntax sync minlines=512 | syntax sync maxlines=512
 
 
 " == diff func ==
