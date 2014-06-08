@@ -101,15 +101,15 @@ aug END
 " = key mappings
 let mapleader=";"
 " - buffers
-noremap <c-q> :q<cr> " see vv
+noremap <c-q> :q<cr>
 nnoremap <a-j> <c-e>
 nnoremap <a-k> <c-y>
 nnoremap <a-h> zh
 nnoremap <a-l> zl
-nnoremap <c-h> <c-w>h
-nnoremap <c-j> <c-w>j
-nnoremap <c-k> <c-w>k
-nnoremap <c-l> <c-w>l
+noremap <c-h> <c-w>h
+noremap <c-j> <c-w>j
+noremap <c-k> <c-w>k
+noremap <c-l> <c-w>l
 nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
@@ -168,6 +168,10 @@ inoremap <c-h> <bs>
 inoremap <c-l> <del>
 " - visual mode
 nnoremap vv <c-v>
+vnoremap <a-h> oho
+vnoremap <a-j> ojo
+vnoremap <a-k> oko
+vnoremap <a-l> olo
 " - run
 "map <leader>rp :exe ":ConqueTermVSplit C:\\Python27\\python.exe -i " . expand("%")
 " - copy paste
@@ -302,7 +306,7 @@ nmap S <Plug>(SneakStreak)
 
 " = clever f
 NeoBundle 'rhysd/clever-f.vim'
-let g:clever_f_chars_match_any_signs = ';'
+let g:clever_f_chars_match_any_signs = '.'
 
 " = rainbow paranthesis
 NeoBundle 'kien/rainbow_parentheses.vim'
