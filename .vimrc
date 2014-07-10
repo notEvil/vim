@@ -1,13 +1,9 @@
 set nocompatible " be IMproved
 
 if has('vim_starting')
-    set runtimepath+=~/.vim
-    set runtimepath+=~/.vim/bundle/neobundle.vim
+    set runtimepath+=~/.vim/ " use .vim on windows
+    set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
-
-call neobundle#rc(expand('~/.vim/bundle/'))
-
-NeoBundleFetch 'Shougo/neobundle.vim'
 
 
 " = general
@@ -27,6 +23,7 @@ set nowrap
 "set backspace=indent,eol,start " not very vi like
 set backspace=indent,start
 
+
 " - gui
 set guioptions-=T " remove toolbar
 set guioptions-=m " remove menu
@@ -35,7 +32,6 @@ set guioptions-=R
 set guioptions-=l " remove left scrollbar
 set guioptions-=L
 set guioptions-=b " remove bottom scrollbar
-
 
 if has("gui_running") && has("gui_win32") " in gvim, on windows
     aug _maximize
@@ -98,37 +94,48 @@ aug _colorLineNr
     au CursorMoved * call ColoredLineNumbers()
 aug END
 
-
 " = key mappings
 let mapleader=";"
 " - buffers
-noremap <c-q> :q<cr>
+nnoremap <c-q> :q<cr>
 nnoremap <a-j> <c-e>
 nnoremap <a-k> <c-y>
 nnoremap <a-h> zh
 nnoremap <a-l> zl
-noremap <c-h> <c-w>h
-noremap <c-j> <c-w>j
-noremap <c-k> <c-w>k
-noremap <c-l> <c-w>l
+nnoremap <c-h> <c-w>h
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-l> <c-w>l
 nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
 nnoremap <right> <c-w>>
-" copy absolute path to clipboard
-nnoremap <silent> <leader>yp :let @+ = expand('%:p')<cr>
-" open from clipboard
-nnoremap <silent> <leader>pp :e <c-R>+<cr>
+" copy buffer path to clipboard
+nnoremap <leader>yy :let @+ = expand('%:p')<cr>
+" open path from clipboard
+nnoremap <leader>pp :e <c-R>+<cr>
 " - tabs
-noremap <c-t> :tabnew<cr>
+nnoremap <c-t> :tabnew<cr>
 nnoremap <c-f4> :tabclose<cr>
-noremap <c-tab> :tabnext<cr>
+nnoremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
 au TabLeave * let g:lasttab = tabpagenr()
 nnoremap <silent> <c-y> :exe "tabn ".g:lasttab<cr>
 vnoremap <silent> <c-y> :exe "tabn ".g:lasttab<cr>
+nnoremap <c-F1> 1gt
+nnoremap <c-F2> 2gt
+nnoremap <c-F3> 3gt
+nnoremap <c-F4> 4gt
+nnoremap <c-F5> 5gt
+nnoremap <c-F6> 6gt
+nnoremap <c-F7> 7gt
+nnoremap <c-F8> 8gt
+nnoremap <c-F9> 9gt
+nnoremap <c-F10> 10gt
+nnoremap <c-F11> :tabmove -1<cr>
+nnoremap <c-F12> :tabmove +1<cr>
 " - navigation
-noremap # ^
+nnoremap # ^
 nnoremap <space> <c-d>
 vnoremap <space> <c-d>
 nnoremap <s-space> <c-u>
@@ -136,17 +143,8 @@ vnoremap <s-space> <c-u>
 nnoremap <c-i> <c-o>
 nnoremap <c-o> <c-i>
 " - shortcuts
-" . esc
-inoremap fd <esc>
-inoremap <esc> <nop>
-vnoremap fd <esc>
-vnoremap <esc> <nop>
-" . enter
-inoremap jk <cr>
 " . save
-nnoremap <a-s> :update<cr>
-inoremap <a-s> <esc>:update<cr>a
-vnoremap <a-s> <esc>:update<cr>gv
+nnoremap <c-s> :update<cr>
 " - regex
 nnoremap / /\v
 vnoremap / /\v
@@ -159,7 +157,6 @@ noremap - #
 noremap = *
 vnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 vnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
-
 " - insert mode
 inoremap <a-h> <left>
 inoremap <a-j> <down>
@@ -167,14 +164,14 @@ inoremap <a-k> <up>
 inoremap <a-l> <right>
 inoremap <c-h> <bs>
 inoremap <c-l> <del>
+inoremap <c-j> <c-o>o
+inoremap <c-k> <esc>ddkA
 " - visual mode
 nnoremap vv <c-v>
 vnoremap <a-h> oho
 vnoremap <a-j> ojo
 vnoremap <a-k> oko
 vnoremap <a-l> olo
-" - run
-"map <leader>rp :exe ":ConqueTermVSplit C:\\Python27\\python.exe -i " . expand("%")
 " - copy paste
 " insert before cursor, cursor moves to the end
 nnoremap p gP
@@ -239,31 +236,10 @@ endif
 autocmd Syntax * syn sync clear | syntax sync minlines=512 | syntax sync maxlines=512
 
 
-" == diff func ==
-set diffexpr=MyDiff()
-function MyDiff()
-  let opt = '-a --binary '
-  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-  let arg1 = v:fname_in
-  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-  let arg2 = v:fname_new
-  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-  let arg3 = v:fname_out
-  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-  let eq = ''
-  if $VIMRUNTIME =~ ' '
-    if &sh =~ '\<cmd'
-      let cmd = '""' . $VIMRUNTIME . '\diff"'
-      let eq = '"'
-    else
-      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-    endif
-  else
-    let cmd = $VIMRUNTIME . '\diff'
-  endif
-  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-endfunction
+" initialize neobundle
+call neobundle#begin(expand('~/.vim/bundle/'))
+NeoBundleFetch 'Shougo/neobundle.vim'
+
 
 
 
@@ -292,11 +268,12 @@ NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'tacahiroy/ctrlp-funky'
 let g:ctrlp_extensions = ['funky']
 let g:ctrlp_working_path_mode = 'c'
+let g:ctrlp_max_depth = 1 " speed up
 let g:ctrlp_cmd = 'CtrlPMixed'
 
 " = ycm
 NeoBundle 'Valloric/YouCompleteMe'
-nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
+nnoremap gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
@@ -314,21 +291,19 @@ NeoBundle 'scrooloose/nerdcommenter'
 " = sneak
 NeoBundle 'notEvil/vim-sneak'
 let g:sneak#use_ic_scs = 1 " smartcase
-let g:sneak#s_next = 1
 let g:sneak#s2ws = 2
 let g:sneak#dot2any = 1
 nmap s <Plug>(MyStreak)
+nmap S <Plug>(MyStreakBackward)
 xmap s <Plug>(MyStreak)
+xmap S <Plug>(MyStreakBackward)
 omap s <Plug>(MyStreak)
-nmap S <Plug>(SneakStreak)
+omap S <Plug>(MyStreakBackward)
 
 " = clever f
 NeoBundle 'rhysd/clever-f.vim'
 let g:clever_f_chars_match_any_signs = '.'
-
-" = rainbow paranthesis
-NeoBundle 'kien/rainbow_parentheses.vim'
-nnoremap <leader>tr :RainbowParenthesesToggle<cr>
+let g:clever_f_fix_key_direction = 1
 
 " = surround
 NeoBundle 'tpope/vim-surround'
@@ -339,7 +314,7 @@ nmap <Plug>IgnoreMarkSearchNext <Plug>MarkSearchNext
 nmap <Plug>IgnoreMarkSearchPrev <Plug>MarkSearchPrev
 let g:mwDirectGroupJumpMappingNum = 0
 
-" = neobundle
-NeoBundleCheck
 
+call neobundle#end()
+NeoBundleCheck
 
