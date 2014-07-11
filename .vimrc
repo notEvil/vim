@@ -157,6 +157,9 @@ noremap - #
 noremap = *
 vnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 vnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
+" - insert new lines
+nnoremap <c-j> O<esc>j
+nnoremap <c-k> kdd
 " - insert mode
 inoremap <silent> <esc> <esc>`^
 inoremap <a-h> <left>
@@ -167,8 +170,8 @@ inoremap <a-i> <c-o>I
 inoremap <a-a> <c-o>A
 inoremap <c-h> <bs>
 inoremap <c-l> <del>
-inoremap <c-j> <c-o>o
-inoremap <c-k> <esc>k:+1d<cr>A
+inoremap <c-j> <esc>m`O<esc>``a
+inoremap <c-k> <esc>m`kdd``a
 inoremap <c-p> <c-R>"
 " - visual mode
 nnoremap vv <c-v>
@@ -176,6 +179,10 @@ vnoremap <a-h> oho
 vnoremap <a-j> ojo
 vnoremap <a-k> oko
 vnoremap <a-l> olo
+vnoremap <c-j> <esc>`<O<esc>`>jddgv
+vnoremap <c-k> <esc>`<kdd`>o<esc>gv
+"vnoremap <c-j> ygvjojpkC<esc>gv " alternative
+"vnoremap <c-k> ygvkokgPC<esc>gv
 " - copy paste
 " insert before cursor, cursor moves to the end
 nnoremap p gP
