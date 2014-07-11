@@ -241,10 +241,6 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
 
 
-
-
-
-
 " = startify
 NeoBundle 'mhinz/vim-startify'
 let g:startify_session_dir = '~/.vim/sessions'
@@ -273,7 +269,8 @@ let g:ctrlp_cmd = 'CtrlPMixed'
 
 " = ycm
 NeoBundle 'Valloric/YouCompleteMe'
-nnoremap gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
+" it's not possible to remap gd
+nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
