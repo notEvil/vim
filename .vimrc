@@ -158,16 +158,15 @@ noremap = *
 vnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 vnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
 " - insert mode
+inoremap <silent> <esc> <esc>`^
 inoremap <a-h> <left>
 inoremap <a-j> <down>
 inoremap <a-k> <up>
 inoremap <a-l> <right>
 inoremap <c-h> <bs>
 inoremap <c-l> <del>
-inoremap <a-a> <c-o>A
-inoremap <c-p> <c-R>"
 inoremap <c-j> <c-o>o
-inoremap <c-k> <esc>ddkA
+inoremap <c-k> <esc>k:+1d<cr>A
 " - visual mode
 nnoremap vv <c-v>
 vnoremap <a-h> oho
@@ -249,7 +248,7 @@ let g:startify_session_dir = '~/.vim/sessions'
 let g:startify_list_order = ['files', 'bookmarks', 'sessions']
 let g:startify_custom_indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'] " loops on linux
 let g:startify_bookmarks = [ '~/.vimrc' ]
-nnoremap <leader>ss :Startify<cr>
+noremap <leader>ss :Startify<cr>
 
 " = airline
 NeoBundle 'bling/vim-airline'
@@ -306,22 +305,12 @@ let g:clever_f_fix_key_direction = 1
 
 " = surround
 NeoBundle 'tpope/vim-surround'
-let g:surround_no_mappings = 1
-nmap ds <Plug>Dsurround
-nmap cs <Plug>Csurround
-xmap is <Plug>VSurround
 
 " = mark
 NeoBundle 'dusans/Mark--Karkat'
 nmap <Plug>IgnoreMarkSearchNext <Plug>MarkSearchNext 
 nmap <Plug>IgnoreMarkSearchPrev <Plug>MarkSearchPrev
 let g:mwDirectGroupJumpMappingNum = 0
-
-" = replay
-NeoBundle 'chrisbra/Replay'
-
-" = auto pairs
-NeoBundle 'jiangmiao/auto-pairs'
 
 
 call neobundle#end()
