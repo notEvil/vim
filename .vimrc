@@ -164,6 +164,8 @@ inoremap <a-k> <up>
 inoremap <a-l> <right>
 inoremap <c-h> <bs>
 inoremap <c-l> <del>
+inoremap <a-a> <c-o>A
+inoremap <c-p> <c-R>"
 inoremap <c-j> <c-o>o
 inoremap <c-k> <esc>ddkA
 " - visual mode
@@ -186,7 +188,7 @@ nnoremap <c-v> "+gP
 " insert clipboard at the end of line, cursor moves to the entry point of the insertion
 "nnoremap <c-s-v> $"+p`[ " doesnt work because c-s-v is equal to c-v
 " insert clipboard, move to the end, stay in insert mode
-inoremap <c-v> <esc>"+gpi
+inoremap <c-v> <c-R>+
 " replace selection, move to the end
 vnoremap <c-v> d"+gP
 
@@ -247,7 +249,7 @@ let g:startify_session_dir = '~/.vim/sessions'
 let g:startify_list_order = ['files', 'bookmarks', 'sessions']
 let g:startify_custom_indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')'] " loops on linux
 let g:startify_bookmarks = [ '~/.vimrc' ]
-noremap <leader>ss :Startify<cr>
+nnoremap <leader>ss :Startify<cr>
 
 " = airline
 NeoBundle 'bling/vim-airline'
@@ -304,12 +306,22 @@ let g:clever_f_fix_key_direction = 1
 
 " = surround
 NeoBundle 'tpope/vim-surround'
+let g:surround_no_mappings = 1
+nmap ds <Plug>Dsurround
+nmap cs <Plug>Csurround
+xmap is <Plug>VSurround
 
 " = mark
 NeoBundle 'dusans/Mark--Karkat'
 nmap <Plug>IgnoreMarkSearchNext <Plug>MarkSearchNext 
 nmap <Plug>IgnoreMarkSearchPrev <Plug>MarkSearchPrev
 let g:mwDirectGroupJumpMappingNum = 0
+
+" = replay
+NeoBundle 'chrisbra/Replay'
+
+" = auto pairs
+NeoBundle 'jiangmiao/auto-pairs'
 
 
 call neobundle#end()
