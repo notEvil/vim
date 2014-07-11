@@ -158,16 +158,18 @@ noremap = *
 vnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 vnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
 " - insert mode
+inoremap <silent> <esc> <esc>`^
 inoremap <a-h> <left>
 inoremap <a-j> <down>
 inoremap <a-k> <up>
 inoremap <a-l> <right>
+inoremap <a-i> <c-o>I
+inoremap <a-a> <c-o>A
 inoremap <c-h> <bs>
 inoremap <c-l> <del>
-inoremap <a-a> <c-o>A
-inoremap <c-p> <c-R>"
 inoremap <c-j> <c-o>o
-inoremap <c-k> <esc>ddkA
+inoremap <c-k> <esc>k:+1d<cr>A
+inoremap <c-p> <c-R>"
 " - visual mode
 nnoremap vv <c-v>
 vnoremap <a-h> oho
