@@ -157,9 +157,6 @@ noremap - #
 noremap = *
 vnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 vnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
-" - insert new lines
-nnoremap <c-j> O<esc>j
-nnoremap <c-k> kdd
 " - insert mode
 inoremap <silent> <esc> <esc>`^
 inoremap <a-h> <left>
