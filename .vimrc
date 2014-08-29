@@ -165,9 +165,6 @@ noremap - #
 noremap = *
 xnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 xnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
-" - insert new lines
-nnoremap <c-n> m`O<esc>``
-nnoremap <c-e> m`kdd``
 " - insert mode
 inoremap <silent> <esc> <esc>`^
 inoremap <a-h> <left> " TODO why not working
@@ -179,6 +176,9 @@ inoremap <a-i> <right>
 inoremap <c-h> <bs> " TODO: collides with ycm
 inoremap <c-i> <del>
 inoremap <c-n> <esc>m`O<esc>``a
+" - insert new lines
+nnoremap <c-n> m`O<esc>``
+nnoremap <c-e> m`kdd``
 inoremap <c-e> <esc>m`kdd``a
 inoremap <c-p> <c-R>"
 " - visual mode
