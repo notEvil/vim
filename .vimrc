@@ -98,14 +98,14 @@ aug END
 let mapleader=";"
 " - buffers
 nnoremap <c-q> :q<cr>
-nnoremap <a-j> <c-e>
-nnoremap <a-k> <c-y>
-nnoremap <a-h> zh
-nnoremap <a-l> zl
+"nnoremap <a-j> <c-e> " lost
+"nnoremap <a-k> <c-y>
+"nnoremap <a-h> zh
+"nnoremap <a-l> zl
 nnoremap <c-h> <c-w>h
-nnoremap <c-j> <c-w>j
-nnoremap <c-k> <c-w>k
-nnoremap <c-l> <c-w>l
+nnoremap <c-n> <c-w>j
+nnoremap <c-e> <c-w>k
+nnoremap <c-i> <c-w>l
 nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
@@ -120,8 +120,8 @@ nnoremap <c-f4> :tabclose<cr>
 nnoremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
 au TabLeave * let g:lasttab = tabpagenr()
-nnoremap <silent> <c-y> :exe "tabn ".g:lasttab<cr>
-vnoremap <silent> <c-y> :exe "tabn ".g:lasttab<cr>
+nnoremap <silent> <c-j> :exe "tabn ".g:lasttab<cr>
+xnoremap <silent> <c-j> :exe "tabn ".g:lasttab<cr>
 nnoremap <c-F1> 1gt
 nnoremap <c-F2> 2gt
 nnoremap <c-F3> 3gt
@@ -135,11 +135,19 @@ nnoremap <c-F10> 10gt
 nnoremap <c-F11> :tabmove -1<cr>
 nnoremap <c-F12> :tabmove +1<cr>
 " - navigation
+nnoremap <a-h> h
+nnoremap <a-n> j
+nnoremap <a-e> k
+nnoremap <a-i> l
+xnoremap <a-h> h
+xnoremap <a-n> j
+xnoremap <a-e> k
+xnoremap <a-i> l
 nnoremap # ^
 nnoremap <space> <c-d>
-vnoremap <space> <c-d>
+xnoremap <space> <c-d>
 nnoremap <s-space> <c-u>
-vnoremap <s-space> <c-u>
+xnoremap <s-space> <c-u>
 nnoremap <c-i> <c-o>
 nnoremap <c-o> <c-i>
 " - shortcuts
@@ -147,40 +155,40 @@ nnoremap <c-o> <c-i>
 nnoremap <c-s> :update<cr>
 " - regex
 nnoremap / /\v
-vnoremap / /\v
+xnoremap / /\v
 nnoremap ? ?\v
-vnoremap ? ?\v
+xnoremap ? ?\v
 nnoremap R :%s///g<left><left>
-vnoremap R :s///g<left><left>
+xnoremap R :s///g<left><left>
 nnoremap // :nohlsearch<cr>
 noremap - #
 noremap = *
-vnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
-vnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
+xnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
+xnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
 " - insert new lines
-nnoremap <c-j> O<esc>j
-nnoremap <c-k> kdd
+nnoremap <c-n> m`O<esc>``
+nnoremap <c-e> m`kdd``
 " - insert mode
 inoremap <silent> <esc> <esc>`^
-inoremap <a-h> <left>
-inoremap <a-j> <down>
-inoremap <a-k> <up>
-inoremap <a-l> <right>
-inoremap <a-i> <c-o>I
-inoremap <a-a> <c-o>A
-inoremap <c-h> <bs>
-inoremap <c-l> <del>
-inoremap <c-j> <esc>m`O<esc>``a
-inoremap <c-k> <esc>m`kdd``a
+inoremap <a-h> <left> " TODO why not working
+inoremap <a-n> <down>
+inoremap <a-e> <up>
+inoremap <a-i> <right>
+"inoremap <a-i> <c-o>I " obsolete
+"inoremap <a-a> <c-o>A
+inoremap <c-h> <bs> " TODO: collides with ycm
+inoremap <c-i> <del>
+inoremap <c-n> <esc>m`O<esc>``a
+inoremap <c-e> <esc>m`kdd``a
 inoremap <c-p> <c-R>"
 " - visual mode
 nnoremap vv <c-v>
-vnoremap <a-h> oho
-vnoremap <a-j> ojo
-vnoremap <a-k> oko
-vnoremap <a-l> olo
-vnoremap <c-j> <esc>`<O<esc>`>jddgv
-vnoremap <c-k> <esc>`<kdd`>o<esc>gv
+"vnoremap <a-h> oho " lost
+"vnoremap <a-j> ojo
+"vnoremap <a-k> oko
+"vnoremap <a-l> olo
+"vnoremap <c-j> <esc>`<O<esc>`>jddgv " TODO: move to func
+"vnoremap <c-k> <esc>`<kdd`>o<esc>gv
 "vnoremap <c-j> ygvjojpkC<esc>gv " alternative
 "vnoremap <c-k> ygvkokgPC<esc>gv
 " - copy paste
@@ -189,9 +197,9 @@ nnoremap p gP
 " insert at the end of line, cursor moves to the entry point of the insertion
 nnoremap P $p`[
 " copy to clipboard, stay in visual mode
-vnoremap <c-c> "+ygv
+xnoremap <c-c> "+ygv
 " move to clipboard
-vnoremap <c-x> "+ygvd
+xnoremap <c-x> "+ygvd
 " insert clipboard and move to the end
 nnoremap <c-v> "+gP
 " insert clipboard at the end of line, cursor moves to the entry point of the insertion
@@ -199,13 +207,13 @@ nnoremap <c-v> "+gP
 " insert clipboard, move to the end, stay in insert mode
 inoremap <c-v> <c-R>+
 " replace selection, move to the end
-vnoremap <c-v> d"+gP
+xnoremap <c-v> d"+gP
 
 " = indent
 set softtabstop=4
 set shiftwidth=4
 set autoindent
-inoremap <s-tab> <c-v><tab>
+inoremap <s-tab> <c-v><tab> " TODO: not working
 " = folds
 set foldmethod=indent
 set foldlevelstart=1
@@ -331,6 +339,9 @@ NeoBundle 'chrisbra/Replay'
 
 " = auto pairs
 NeoBundle 'jiangmiao/auto-pairs'
+let g:AutoPairsShortcutToggle = ''
+let g:AutoPairsShortcutFastWrap = ''
+let g:AutoPairsShortcutJump = ''
 
 
 call neobundle#end()
