@@ -1,4 +1,5 @@
 set nocompatible " be IMproved
+filetype off " required
 
 if has('vim_starting')
     set runtimepath+=~/.vim/ " use .vim on windows
@@ -7,8 +8,6 @@ endif
 
 
 " = general
-filetype plugin indent on " required!
-
 set sessionoptions+=resize,winpos " restore size/position of window
 set sessionoptions-=options " do not restore temporary options
 set encoding=utf-8
@@ -50,7 +49,7 @@ if has("gui_running")
   if has("gui_win32")
     set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
   else
-    set guifont=Inconsolata\ 13
+    set guifont=Inconsolata\ 11
   endif
 endif
 " - colored line number
@@ -95,17 +94,14 @@ aug _colorLineNr
 aug END
 
 " = key mappings
-let mapleader=";"
+let mapleader = ";"
+let maplocalleader = ";"
 " - buffers
 nnoremap <c-q> :q<cr>
-"nnoremap <a-j> <c-e> " lost
-"nnoremap <a-k> <c-y>
-"nnoremap <a-h> zh
-"nnoremap <a-l> zl
 nnoremap <c-h> <c-w>h
 nnoremap <c-n> <c-w>j
 nnoremap <c-e> <c-w>k
-nnoremap <c-i> <c-w>l
+nnoremap <c-k> <c-w>l
 nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
@@ -153,6 +149,7 @@ nnoremap <c-o> <c-i>
 " - shortcuts
 " . save
 nnoremap <c-s> :update<cr>
+inoremap <c-s> <c-o>:update<cr>
 " - regex
 nnoremap / /\v
 xnoremap / /\v
@@ -167,30 +164,33 @@ xnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 xnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
 " - insert mode
 inoremap <silent> <esc> <esc>`^
-inoremap <a-h> <left> " TODO why not working
+inoremap <a-h> <left>
 inoremap <a-n> <down>
 inoremap <a-e> <up>
 inoremap <a-i> <right>
-"inoremap <a-i> <c-o>I " obsolete
-"inoremap <a-a> <c-o>A
-inoremap <c-h> <bs> " TODO: collides with ycm
+inoremap <c-h> <bs>
 inoremap <c-i> <del>
 inoremap <c-n> <esc>m`O<esc>``a
-" - insert new lines
-nnoremap <c-n> m`O<esc>``
-nnoremap <c-e> m`kdd``
 inoremap <c-e> <esc>m`kdd``a
 inoremap <c-p> <c-R>"
+inoremap <a-a> <c-O>^
+inoremap <a-t> <c-O>$
 " - visual mode
 nnoremap vv <c-v>
-"vnoremap <a-h> oho " lost
-"vnoremap <a-j> ojo
-"vnoremap <a-k> oko
-"vnoremap <a-l> olo
-"vnoremap <c-j> <esc>`<O<esc>`>jddgv " TODO: move to func
-"vnoremap <c-k> <esc>`<kdd`>o<esc>gv
+xnoremap <c-n> <esc>`<O<esc>`>jddgv
+xnoremap <c-e> <esc>`<kdd`>o<esc>gv
 "vnoremap <c-j> ygvjojpkC<esc>gv " alternative
 "vnoremap <c-k> ygvkokgPC<esc>gv
+xnoremap . :normal .<cr>
+" - command mode
+cnoremap <a-h> <left>
+cnoremap <a-n> <up>
+cnoremap <a-e> <down>
+cnoremap <a-i> <right>
+cnoremap <a-a> <Home>
+cnoremap <a-t> <End>
+cnoremap <c-v> <c-R>+
+cnoremap <c-p> <c-R>*
 " - copy paste
 " insert before cursor, cursor moves to the end
 nnoremap p gP
@@ -288,8 +288,12 @@ let g:ctrlp_cmd = 'CtrlPMixed'
 
 " = ycm
 NeoBundle 'Valloric/YouCompleteMe'
+let g:ycm_key_list_select_completion = ['<tab>']
+let g:ycm_key_list_previous_completion = ['<s-tab>']
+let g:ycm_use_ultisnips_completer = 0
 " it's not possible to remap gd
 nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
+inoremap <Nul> <C-n>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
@@ -343,7 +347,55 @@ let g:AutoPairsShortcutToggle = ''
 let g:AutoPairsShortcutFastWrap = ''
 let g:AutoPairsShortcutJump = ''
 
+" = UltiSnips
+NeoBundle 'SirVer/ultisnips'
+let g:UltiSnipsEditSplit = 'vertical'
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+
+" = vim-snippets
+NeoBundle 'honza/vim-snippets'
+
+"" = YankRing
+"NeoBundle 'vim-scripts/YankRing.vim'
+"let yankring_replace_n_pkey = '<a-p>'
+"let yankring_replace_n_nkey = ''
+
+" = R
+NeoBundle 'vim-scripts/Vim-R-plugin'
+xnoremap <leader-rr> <Plug>RDSendSelection
+nnoremap <leader-rr> <Plug>RDSendLine
+
+
+
+" ycm & UltiSnips compatibility
+"inoremap <silent> <expr> <esc> (pumvisible() ? '\<c-e>' : '\<esc>') "annoying
+
+function! g:UltiSnips_Complete()
+  call UltiSnips#ExpandSnippet()
+  if g:ulti_expand_res == 0
+    if pumvisible()
+      return "\<C-n>"
+    else
+      call UltiSnips#JumpForwards()
+      if g:ulti_jump_forwards_res == 0
+        return "\<TAB>"
+      endif
+    endif
+  endif
+  return ""
+endfunction
+
+au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+
 
 call neobundle#end()
+
+
+" finish
+filetype plugin indent on " required!
+
 NeoBundleCheck
+
 
