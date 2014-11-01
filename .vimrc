@@ -167,7 +167,7 @@ xnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 xnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
 " - insert mode
 inoremap <silent> <esc> <esc>`^
-inoremap <a-h> <left> " TODO why not working
+inoremap <a-h> <left>
 inoremap <a-n> <down>
 inoremap <a-e> <up>
 inoremap <a-i> <right>
