@@ -1,0 +1,52 @@
+
+global !p
+import re
+
+def parseArgs(args, pattern=re.compile(r'(?P<v>[a-zA-Z_]\w*)\s*(=[^,)]+)?')):
+    return [match.group('v') for match in pattern.finditer(args)]
+
+endglobal
+
+
+
+snippet def "function"
+def ${1:f}(`!p
+if snip.indent:
+    snip.rv = 'self' + ('' if len(t[2]) == 0 else ', ')
+`${2:x}):
+    ${3:pass}
+$0
+endsnippet
+
+
+snippet class "class"
+class ${1:C}(${2:object}):
+    def __init__(self$3):`!p
+import re
+
+parents = t[2]
+parents = [p.strip() for p in parents.split(',')]
+parents = [p for p in parents if p != '' and p != 'object']
+
+snip.rv = ''
+snip >> 2
+
+for p in parents:
+    snip += p + '.__init__(self)'
+
+args = t[3]
+args = parseArgs(args)
+
+if len(parents) != 0 and len(args) != 0:
+    snip += ''
+
+for arg in args:
+    snip += '{}{} = {}'.format(arg[0].upper(), arg[1::], arg)
+
+if len(parents) != 0 or len(args) != 0:
+    snip += ''
+`
+        ${4:pass}
+    $0
+endsnippet
+
