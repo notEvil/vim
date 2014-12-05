@@ -41,7 +41,7 @@ if len(parents) != 0 and len(args) != 0:
     snip += ''
 
 for arg in args:
-    snip += '{}{} = {}'.format(arg[0].upper(), arg[1::], arg)
+    snip += 'self.{}{} = {}'.format(arg[0].upper(), arg[1::], arg)
 
 if len(parents) != 0 or len(args) != 0:
     snip += ''

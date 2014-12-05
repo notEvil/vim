@@ -19,9 +19,6 @@ set nowrap
 "source $VIMRUNTIME/mswin.vim
 "behave mswin
 
-"set backspace=indent,eol,start " not very vi like
-set backspace=indent,start
-
 
 " - gui
 set guioptions-=T " remove toolbar
@@ -32,7 +29,7 @@ set guioptions-=l " remove left scrollbar
 set guioptions-=L
 set guioptions-=b " remove bottom scrollbar
 
-if has("gui_running") && has("gui_win32") " in gvim, on windows
+if has('gui_running') && has('gui_win32') " in gvim, on windows
     aug _maximize
 	au!
 	au GUIEnter * simalt ~x " start maximized
@@ -45,8 +42,8 @@ endif
 colorscheme wombat
 set background=dark
 " - font
-if has("gui_running")
-  if has("gui_win32")
+if has('gui_running')
+  if has('gui_win32')
     set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
   else
     set guifont=Inconsolata\ 11
@@ -94,14 +91,18 @@ aug _colorLineNr
 aug END
 
 " = key mappings
-let mapleader = ";"
-let maplocalleader = ";"
+let mapleader = ';'
+let maplocalleader = ';'
 " - buffers
 nnoremap <c-q> :q<cr>
 nnoremap <c-h> <c-w>h
 nnoremap <c-n> <c-w>j
 nnoremap <c-e> <c-w>k
 nnoremap <c-k> <c-w>l
+nnoremap <a-up> 5<c-w>-
+nnoremap <a-down> 5<c-w>+
+nnoremap <a-left> 10<c-w><
+nnoremap <a-right> 10<c-w>>
 nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
@@ -116,8 +117,7 @@ nnoremap <c-f4> :tabclose<cr>
 nnoremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
 au TabLeave * let g:lasttab = tabpagenr()
-nnoremap <silent> <c-j> :exe "tabn ".g:lasttab<cr>
-xnoremap <silent> <c-j> :exe "tabn ".g:lasttab<cr>
+nnoremap <silent> <c-j> :exe 'tabn '.g:lasttab<cr>
 nnoremap <c-F1> 1gt
 nnoremap <c-F2> 2gt
 nnoremap <c-F3> 3gt
@@ -158,12 +158,12 @@ xnoremap ? ?\v
 nnoremap R :%s///g<left><left>
 xnoremap R :s///g<left><left>
 nnoremap // :nohlsearch<cr>
-noremap - #
-noremap = *
+nnoremap - #
+nnoremap = *
 xnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 xnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
 " - insert mode
-inoremap <silent> <esc> <esc>`^
+"inoremap <silent> <esc> <esc>`^ " see ultisnips
 inoremap <a-h> <left>
 inoremap <a-n> <down>
 inoremap <a-e> <up>
@@ -213,7 +213,7 @@ xnoremap <c-v> d"+gP
 set softtabstop=4
 set shiftwidth=4
 set autoindent
-inoremap <s-tab> <c-v><tab> " TODO: not working
+"inoremap <s-tab> <c-v><tab> " TODO not working
 " = folds
 set foldmethod=indent
 set foldlevelstart=1
@@ -239,7 +239,7 @@ au BufNewFile,BufRead *.swg set filetype=swig
 let g:LargeFileLimit = 1024 * 1024 * 50 " 50 MB
 
 " Protect large files from sourcing and other overhead. Set read only
-if !exists("my_auto_commands_loaded")
+if !exists('my_auto_commands_loaded')
     let my_auto_commands_loaded = 1
     " noswapfile (save copy of file)
     " bufhidden=unload (save memory when other file is viewed)
@@ -247,7 +247,7 @@ if !exists("my_auto_commands_loaded")
     " undolevels=-1 (no undo possible)
     augroup LargeFile
         " dont need eventignore+=FileType cuz we set syntax sync minlines, maxlines
-        autocmd BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFileLimit | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | endif
+        autocmd BufReadPre * let f=expand('<afile>') | if getfsize(f) > g:LargeFileLimit | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | endif
     augroup END
 endif
 
@@ -274,7 +274,7 @@ set laststatus=2
 set noshowmode
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#tab_nr_type = 1
-let g:airline_theme="powerlineish"
+let g:airline_theme='powerlineish'
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
 
@@ -302,8 +302,8 @@ let g:pymode_rope_completion = 0
 let g:pymode_run_key = ''
 let g:pymode_folding = 0
 let g:pymode_motion = 0
-let g:pymode_rope_rename_bind = '<leader>rr'
-let g:pymode_rope_use_function_bind = '<leader>hu'
+"let g:pymode_rope_rename_bind = '<leader>rr'
+"let g:pymode_rope_use_function_bind = '<leader>hu'
 
 " = NERDcommenter
 NeoBundle 'scrooloose/nerdcommenter'
@@ -350,44 +350,63 @@ let g:AutoPairsShortcutJump = ''
 " = UltiSnips
 NeoBundle 'SirVer/ultisnips'
 let g:UltiSnipsEditSplit = 'vertical'
-let g:UltiSnipsExpandTrigger = "<tab>"
-let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
 
 " = vim-snippets
 NeoBundle 'honza/vim-snippets'
 
-"" = YankRing
-"NeoBundle 'vim-scripts/YankRing.vim'
-"let yankring_replace_n_pkey = '<a-p>'
-"let yankring_replace_n_nkey = ''
-
 " = R
-NeoBundle 'vim-scripts/Vim-R-plugin'
-xnoremap <leader-rr> <Plug>RDSendSelection
-nnoremap <leader-rr> <Plug>RDSendLine
+"NeoBundle 'vim-scripts/Vim-R-plugin'
+NeoBundle 'jcfaria/Vim-R-plugin'
+let g:vimrplugin_user_maps_only = 1
+let g:vimrplugin_assign = 0
+func! Rfile()
+  nmap <leader>rr <Plug>RStart
+  nmap <leader>rq <Plug>RClose
+  nmap <c-cr> <Plug>RDSendLine
+  xmap <c-cr> <Plug>RSendSelection
+  imap <c-cr> <Plug>RSendLine
+  nmap <leader>rh <Plug>RHelp
+  nmap <leader>rs <Plug>RObjectStr
+  nmap <leader>rc <Plug>RClearAll
+  inoremap $ $<c-x><c-o><c-p>
+  inoremap . .<c-x><c-o><c-p>
+endf
+au FileType r call Rfile()
 
+" = Latex
+NeoBundle 'lervag/vim-latex'
+let g:tex_flavor = 'latex'
 
 
 " ycm & UltiSnips compatibility
 "inoremap <silent> <expr> <esc> (pumvisible() ? '\<c-e>' : '\<esc>') "annoying
 
-function! g:UltiSnips_Complete()
+fun! g:UltiSnips_Complete()
   call UltiSnips#ExpandSnippet()
-  if g:ulti_expand_res == 0
-    if pumvisible()
-      return "\<C-n>"
-    else
-      call UltiSnips#JumpForwards()
-      if g:ulti_jump_forwards_res == 0
-        return "\<TAB>"
-      endif
-    endif
+  if g:ulti_expand_res != 0
+    return ''
   endif
-  return ""
-endfunction
+  if pumvisible()
+    " \" != ' ;)
+    return "\<c-n>"
+  endif
+  call UltiSnips#JumpForwards()
+  if g:ulti_jump_forwards_res != 0
+    return ''
+  endif
+  return "\<tab>"
+endfun
 
-au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+" either ycm or ultisnips remap <tab> somewhere => au
+au BufNewFile,BufRead * inoremap <silent> <tab> <c-R>=g:UltiSnips_Complete()<cr>
+" esc may not always exit insert mode, but I still don't know why
+au BufNewFile,BufRead * inoremap <silent> <esc> <esc>`^
+
+"let g:util_expand_or_jump_res=0
+"au BufNewFile,BufRead * inoremap <silent> <expr> <esc> (g:util_expand_or_jump_res != 0 ? '<esc>ab<esc>' : '<esc>')
 
 
 call neobundle#end()
@@ -397,5 +416,4 @@ call neobundle#end()
 filetype plugin indent on " required!
 
 NeoBundleCheck
-
 
