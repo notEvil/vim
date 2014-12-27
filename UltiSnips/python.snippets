@@ -2,7 +2,7 @@
 global !p
 import re
 
-def parseArgs(args, pattern=re.compile(r'(?P<v>[a-zA-Z_]\w*)\s*(=[^,)]+)?')):
+def parseArgs(args, pattern=re.compile(r'(^|\s|,)(?P<v>[a-zA-Z_]\w*)\s*(=[^,)]+)?')):
     return [match.group('v') for match in pattern.finditer(args)]
 
 endglobal
@@ -26,7 +26,7 @@ import re
 
 parents = t[2]
 parents = [p.strip() for p in parents.split(',')]
-parents = [p for p in parents if p != '' and p != 'object']
+parents = filter(lambda x: x != '' and x != 'object', parents)
 
 snip.rv = ''
 snip >> 2
