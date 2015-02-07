@@ -1,9 +1,54 @@
 
 global !p
 import re
+import regex
 
 def parseArgs(args, pattern=re.compile(r'(^|\s|,)(?P<v>[a-zA-Z_]\w*)\s*(=[^,)]+)?')):
     return [match.group('v') for match in pattern.finditer(args)]
+
+def parseArgs2(args, pattern=regex.compile(r'''
+(^|,)\s*(
+(?P<p>/|\.|(\d+))               # a parent modifier
+|( (?P<k>[a-zA-Z_]\w*)(\s*=\s*  # or name(=value)?
+(?P<v>(
+    [^,([{'"]*
+    (?P<r>
+        (\((?>[^()'"]|(?&r))*\))
+       |(\[(?>[^[]'"]|(?&r))*\])
+       |(\{(?>[^{}'"]|(?&r))*\})
+       |('((\\')|[^'])*')
+       |("((\\")|[^"])*")
+    )?
+)+)
+)?)
+|(?P<o>\*\*?[a-zA-Z_]\w*)       # or *arg or **kwarg
+)''', regex.VERBOSE)):
+    parents = [-1]
+    r = []
+    rByParent = {}
+    for match in pattern.finditer(args):
+        p = match.group('p')
+        if p != None:
+            if p == '/': parents = [-1]
+            elif p == '.': parents = [0]
+            else: parents = map(int, map(str, p))
+            continue
+
+        k = match.group('k')
+        if k != None:
+            v = match.group('v')
+        else:
+            k = match.group('o')
+            v = None
+
+        if v != None:
+            v = v.strip()
+        r.append((k, v))
+
+        for parent in parents:
+            rByParent.setdefault(parent, []).append((k, v))
+
+    return r, rByParent
 
 endglobal
 
@@ -14,39 +59,102 @@ def ${1:f}(`!p
 if snip.indent:
     snip.rv = 'self' + ('' if len(t[2]) == 0 else ', ')
 `${2:x}):
-    ${3:pass}
-$0
+    ${0:pass}
 endsnippet
+
+
+# deprecated
+#snippet class "class"
+#class ${1:C}(${2:object}):
+    #def __init__(self$3):`!p
+#import re
+
+#parents = t[2]
+#parents = [p.strip() for p in parents.split(',')]
+#parents = filter(lambda x: x != '' and x != 'object', parents)
+
+#snip.rv = ''
+#snip >> 2
+
+#for p in parents:
+    #snip += p + '.__init__(self)'
+
+#args = t[3]
+#args = parseArgs(args)
+
+#if len(parents) != 0 and len(args) != 0:
+    #snip += ''
+
+#for arg in args:
+    #snip += 'self.{}{} = {}'.format(arg[0].upper(), arg[1::], arg)
+
+#if len(parents) != 0 or len(args) != 0:
+    #snip += ''
+#`
+        #${4:pass}
+    #$0
+#endsnippet
 
 
 snippet class "class"
 class ${1:C}(${2:object}):
-    def __init__(self$3):`!p
-import re
+    def __init__(self`!p
+args = t[3].strip()
+if args == '__args__':
+    args = ''
+
+args, argsByParent = parseArgs2(args)
+
+if len(args) == 0:
+    snip.rv += '):'
+else:
+    snip.rv += ', {}):'.format(', '.join(k if v == None else '{}={}'.format(k, v)
+                                      for k, v in args))
+snip >> 2
 
 parents = t[2]
 parents = [p.strip() for p in parents.split(',')]
 parents = filter(lambda x: x != '' and x != 'object', parents)
 
-snip.rv = ''
-snip >> 2
+parentsArgs = set()
 
-for p in parents:
-    snip += p + '.__init__(self)'
+for i, p in enumerate(parents):
+    parentArgs = []
+    unique = set()
 
-args = t[3]
-args = parseArgs(args)
+    parentArgs.extend( argsByParent.get(0, []) )
+    unique.update(parentArgs)
 
-if len(parents) != 0 and len(args) != 0:
+    for arg in argsByParent.get(i + 1, []):
+        if arg in unique:
+            continue
+        parentArgs.append(arg)
+        unique.add(arg)
+
+    parentsArgs.update(unique)
+
+    snip += '{}.__init__(self{})'.format(p, '' if len(parentArgs) == 0 else
+                                            ', {}'.format(', '.join(k for k, v in parentArgs)))
+if len(parents) != 0:
     snip += ''
 
+members = False
 for arg in args:
-    snip += 'self.{}{} = {}'.format(arg[0].upper(), arg[1::], arg)
+    if arg in parentsArgs:
+        continue
+    k, v = arg
+    if k.startswith('*'):
+        continue
+    members = True
 
-if len(parents) != 0 or len(args) != 0:
+    snip += 'self.{}{} = {}'.format(k[0].upper(), k[1::], k)
+
+if members:
     snip += ''
 `
-        ${4:pass}
+        pass # ${3:__args__}
     $0
 endsnippet
+
+
 

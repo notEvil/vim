@@ -50,10 +50,10 @@ if has('gui_running')
   endif
 endif
 " - colored line number
-func! Interpolate(p, fro, to)
+fun! Interpolate(p, fro, to)
     return a:fro + a:p * (a:to - a:fro)
-endf
-func! ColoredLineNumbers()
+endfun
+fun! ColoredLineNumbers()
     let endLNr = max([2, line('$')]) " avoid div by zero
     let p = (line('.') - 1.0) / (endLNr - 1)
 
@@ -83,7 +83,7 @@ func! ColoredLineNumbers()
     endif
 
     exe('hi CursorLineNr guibg=#'.bg_c.' guifg='.fg_c)
-endf
+endfun
 
 aug _colorLineNr
     au!
@@ -93,6 +93,9 @@ aug END
 " = key mappings
 let mapleader = ';'
 let maplocalleader = ';'
+" = switch black/white
+nnoremap <leader>td :colorscheme wombat<cr>
+nnoremap <leader>tl :colorscheme sienna<cr>
 " - buffers
 nnoremap <c-q> :q<cr>
 nnoremap <c-h> <c-w>h
@@ -117,7 +120,7 @@ nnoremap <c-f4> :tabclose<cr>
 nnoremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
 au TabLeave * let g:lasttab = tabpagenr()
-nnoremap <silent> <c-j> :exe 'tabn '.g:lasttab<cr>
+nnoremap <c-j> :tabn <c-r>=g:lasttab<cr><cr>
 nnoremap <c-F1> 1gt
 nnoremap <c-F2> 2gt
 nnoremap <c-F3> 3gt
@@ -175,6 +178,36 @@ inoremap <c-e> <esc>m`kdd``a
 inoremap <c-p> <c-R>"
 inoremap <a-a> <c-O>^
 inoremap <a-t> <c-O>$
+fun! StripLeft(x)
+  return substitute(a:x, '\v(^\s+)', '', 'g')
+endfun
+fun! FindSimilar(iWhite)
+  let cLineNo = line('.')
+  let cColNo = col('.')
+  let cLine = getline(cLineNo)
+
+  if a:iWhite
+    let cLine = StripLeft(cLine)
+    let pattern = '\s\*'.escape(cLine, '\')
+  else
+    let pattern = escape(cLine, '\')
+  endif
+  let pattern = '\V\^'.pattern
+
+  call cursor(cLineNo - 1, 1)
+  let [l, c] = searchpos(pattern, 'bcn')
+  if l == 0
+    return ''
+  endif
+  call cursor(cLineNo, cColNo)
+
+  let r = getline(l)
+  if a:iWhite
+    let r = StripLeft(r)
+  endif
+  return strpart(r, strlen(cLine))
+endfun
+inoremap <c-tab> <c-r>=FindSimilar(1)<cr>
 " - visual mode
 nnoremap vv <c-v>
 xnoremap <c-n> <esc>`<O<esc>`>jddgv
@@ -239,17 +272,15 @@ au BufNewFile,BufRead *.swg set filetype=swig
 let g:LargeFileLimit = 1024 * 1024 * 50 " 50 MB
 
 " Protect large files from sourcing and other overhead. Set read only
-if !exists('my_auto_commands_loaded')
-    let my_auto_commands_loaded = 1
-    " noswapfile (save copy of file)
-    " bufhidden=unload (save memory when other file is viewed)
-    " buftype=nowritefile (is read-only)
-    " undolevels=-1 (no undo possible)
-    augroup LargeFile
-        " dont need eventignore+=FileType cuz we set syntax sync minlines, maxlines
-        autocmd BufReadPre * let f=expand('<afile>') | if getfsize(f) > g:LargeFileLimit | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | endif
-    augroup END
-endif
+" noswapfile (save copy of file)
+" bufhidden=unload (save memory when other file is viewed)
+" buftype=nowritefile (is read-only)
+" undolevels=-1 (no undo possible)
+aug LargeFile
+    au!
+    " dont need eventignore+=FileType cuz we set syntax sync minlines, maxlines
+    autocmd BufReadPre * let f=expand('<afile>') | if getfsize(f) > g:LargeFileLimit | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | endif
+aug END
 
 " how many lines before/max current line to start syntax highlighting parsing
 autocmd Syntax * syn sync clear | syntax sync minlines=512 | syntax sync maxlines=512
@@ -299,11 +330,80 @@ inoremap <Nul> <C-n>
 NeoBundle 'klen/python-mode'
 let g:pymode_lint_on_write = 0
 let g:pymode_rope_completion = 0
-let g:pymode_run_key = ''
+let g:pymode_run = 0
 let g:pymode_folding = 0
 let g:pymode_motion = 0
 "let g:pymode_rope_rename_bind = '<leader>rr'
 "let g:pymode_rope_use_function_bind = '<leader>hu'
+NeoBundle 'vim-debug'
+fun! PythonFile()
+  fun! Start(args)
+    exe 'Pyclewn pdb '.join(a:args, ' ')
+    sleep 100m
+    sleep 100m
+  endfun
+  fun! Stop(args)
+    C import sys; sys.exit(1)
+  endfun
+  fun! Command(command)
+    exe 'C '.escape(a:command, '"')
+  endfun
+  fun! PutBp(bp)
+    exe 'C'.(a:bp.temp ? 't' : '').'break '.a:bp.file.':'.a:bp.line.', '.a:bp.condition
+  endfun
+  fun! RemoveBp(bp)
+    exe 'Cclear '.a:bp.file.':'.a:bp.line
+  endfun
+  fun! ChangeBpCondition(bp, condition)
+    exe 'Ccondition '.a:bp.count.' '.a:condition
+  endfun
+  fun! SetBpEnabled(bp, enabled)
+    exe 'C'.(a:enabled ? 'enable' : 'disable').' '.a:bp.count
+  endfun
+  fun! SetBpIgnore(bp, ignore)
+    exe 'Cignore '.a:bp.count.' '.a:ignore
+  endfun
+  fun! Print(x, pretty)
+    exe 'Cp'.(a:pretty ? 'p' : '').' '.a:x
+  endfun
+  let g:debug#opts = {
+  \ 'startF': function('Start'),
+  \ 'stopF': function('Stop'),
+  \ 'commandF': function('Command'),
+  \ 'putBpF': function('PutBp'),
+  \ 'removeBpF': function('RemoveBp'),
+  \ 'changeBpConditionF': function('ChangeBpCondition'),
+  \ 'setBpEnabledF': function('SetBpEnabled'),
+  \ 'setBpIgnoreF': function('SetBpIgnore'),
+  \ 'printF': function('Print')
+  \ }
+  " without sleep commands might not get executed
+  nnoremap <leader>dr :call debug#dummy()<cr>:DebugStart <c-r>=expand('%:p')<cr><cr>
+  nnoremap <leader>dq :DebugStop<cr>
+  nnoremap <leader>dl :call debug#load()<cr>
+  nnoremap <leader>ds :call debug#save()<cr>
+  nnoremap <c-c> :Cinterrupt<cr>
+  nnoremap <F1> :call debug#printWatch()<cr>
+  nnoremap <F5> :Cstep<cr>
+  nnoremap <F6> :Cnext<cr>
+  nnoremap <F7> :Creturn<cr>:call debug#clearTemps()<cr>
+  nnoremap <F8> :Ccontinue<cr>:call debug#clearTemps()<cr>
+  nnoremap <F11> :Cup<cr>
+  nnoremap <F12> :Cdown<cr>
+  " breakpoints
+  nnoremap <leader>d<space> :call debug#toggleHere(0)<cr>
+  nnoremap <leader>dc :DebugBp <c-r>=debug#getRecommends()<cr> 
+  nnoremap <leader>dt :call debug#toggleHere(1)<cr>
+  nnoremap <leader>dd :call debug#toggleHere(1)<cr>:Ccontinue<cr>:call debug#clearTemps()<cr>
+  nnoremap <leader>de :call debug#toggleEnabled(debug#here())<cr>
+  nnoremap <leader>di :DebugBpIgnore 
+  " prints
+  nnoremap <leader>dp :Cpp <c-r>=expand('<cword>')<cr><cr>
+  xnoremap <leader>dp ""y:Cpp <c-r>=escape(@", '"')<cr><cr>
+  inoremap <c-cr> <c-o>on<c-o>:Cpp <c-r>=getline(line('.')-1)<cr><cr><bs>
+  nnoremap <leader>dw :DebugWatch 
+endfun
+au FileType python call PythonFile()
 
 " = NERDcommenter
 NeoBundle 'scrooloose/nerdcommenter'
@@ -353,6 +453,7 @@ let g:UltiSnipsEditSplit = 'vertical'
 let g:UltiSnipsExpandTrigger = '<tab>'
 let g:UltiSnipsJumpForwardTrigger = '<tab>'
 let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
+let g:UltiSnipsListSnippets = '<Nop>'
 
 " = vim-snippets
 NeoBundle 'honza/vim-snippets'
@@ -362,7 +463,7 @@ NeoBundle 'honza/vim-snippets'
 NeoBundle 'jcfaria/Vim-R-plugin'
 let g:vimrplugin_user_maps_only = 1
 let g:vimrplugin_assign = 0
-func! Rfile()
+fun! RFile()
   nmap <leader>rr <Plug>RStart
   nmap <leader>rq <Plug>RClose
   nmap <c-cr> <Plug>RDSendLine
@@ -373,12 +474,27 @@ func! Rfile()
   nmap <leader>rc <Plug>RClearAll
   inoremap $ $<c-x><c-o><c-p>
   inoremap . .<c-x><c-o><c-p>
-endf
-au FileType r call Rfile()
+endfun
+au FileType r call RFile()
 
 " = Latex
 NeoBundle 'lervag/vim-latex'
 let g:tex_flavor = 'latex'
+
+" = vdebug
+NeoBundle 'joonty/vdebug.git'
+let g:vdebug_keymap = {
+\ 'run': '<leader>dr',
+\ 'run_to_cursor': '<leader>dd',
+\ 'step_over': '<F6>',
+\ 'step_into': '<F5>',
+\ 'step_out': '<F7>',
+\ 'close': '<leader>dq',
+\ 'set_breakpoint': '<leader>d<space>',
+\ 'get_context': '<F1>',
+\ 'eval_under_cursor': '<leader>dp',
+\ 'eval_visual': '<leader>dp'
+\ }
 
 
 " ycm & UltiSnips compatibility
@@ -401,8 +517,9 @@ fun! g:UltiSnips_Complete()
 endfun
 
 " either ycm or ultisnips remap <tab> somewhere => au
+" TODO doesn't seem to work when opening file from cmd line
 au BufNewFile,BufRead * inoremap <silent> <tab> <c-R>=g:UltiSnips_Complete()<cr>
-" esc may not always exit insert mode, but I still don't know why
+" TODO esc may not always exit insert mode, but I still don't know why
 au BufNewFile,BufRead * inoremap <silent> <esc> <esc>`^
 
 "let g:util_expand_or_jump_res=0
@@ -416,4 +533,6 @@ call neobundle#end()
 filetype plugin indent on " required!
 
 NeoBundleCheck
+
+
 
