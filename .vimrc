@@ -39,8 +39,9 @@ endif
 
 " = visual
 " - colors
-colorscheme wombat
 set background=dark
+set t_Co=256
+colorscheme wombat256mod
 " - font
 if has('gui_running')
   if has('gui_win32')
@@ -84,7 +85,6 @@ fun! ColoredLineNumbers()
 
     exe('hi CursorLineNr guibg=#'.bg_c.' guifg='.fg_c)
 endfun
-
 aug _colorLineNr
     au!
     au CursorMoved * call ColoredLineNumbers()
@@ -94,7 +94,7 @@ aug END
 let mapleader = ';'
 let maplocalleader = ';'
 " = switch black/white
-nnoremap <leader>td :colorscheme wombat<cr>
+nnoremap <leader>td :colorscheme wombat256mod<cr>
 nnoremap <leader>tl :colorscheme sienna<cr>
 " - buffers
 nnoremap <c-q> :q<cr>
@@ -102,18 +102,18 @@ nnoremap <c-h> <c-w>h
 nnoremap <c-n> <c-w>j
 nnoremap <c-e> <c-w>k
 nnoremap <c-k> <c-w>l
-nnoremap <a-up> 5<c-w>-
-nnoremap <a-down> 5<c-w>+
-nnoremap <a-left> 10<c-w><
-nnoremap <a-right> 10<c-w>>
 nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
 nnoremap <right> <c-w>>
+nnoremap <a-up> 5<c-w>-
+nnoremap <a-down> 5<c-w>+
+nnoremap <a-left> 10<c-w><
+nnoremap <a-right> 10<c-w>>
 " copy buffer path to clipboard
 nnoremap <leader>yy :let @+ = expand('%:p')<cr>
 " open path from clipboard
-nnoremap <leader>pp :e <c-R>+<cr>
+nnoremap <leader>pp :e <c-R>=escape(@+, ' ')<cr><cr>
 " - tabs
 nnoremap <c-t> :tabnew<cr>
 nnoremap <c-f4> :tabclose<cr>
@@ -143,6 +143,8 @@ xnoremap <a-n> j
 xnoremap <a-e> k
 xnoremap <a-i> l
 nnoremap # ^
+nnoremap <a-a> ^
+nnoremap <a-t> $
 nnoremap <space> <c-d>
 xnoremap <space> <c-d>
 nnoremap <s-space> <c-u>
@@ -153,6 +155,7 @@ nnoremap <c-o> <c-i>
 " . save
 nnoremap <c-s> :update<cr>
 inoremap <c-s> <c-o>:update<cr>
+xnoremap <c-s> :<c-u>update<cr>gv
 " - regex
 nnoremap / /\v
 xnoremap / /\v
@@ -171,41 +174,30 @@ inoremap <a-h> <left>
 inoremap <a-n> <down>
 inoremap <a-e> <up>
 inoremap <a-i> <right>
+inoremap <a-a> <c-O>^
+inoremap <a-t> <c-O>$
 inoremap <c-h> <bs>
 inoremap <c-i> <del>
 inoremap <c-n> <esc>m`O<esc>``a
 inoremap <c-e> <esc>m`kdd``a
 inoremap <c-p> <c-R>"
-inoremap <a-a> <c-O>^
-inoremap <a-t> <c-O>$
 fun! StripLeft(x)
   return substitute(a:x, '\v(^\s+)', '', 'g')
 endfun
 fun! FindSimilar(iWhite)
-  let cLineNo = line('.')
-  let cColNo = col('.')
-  let cLine = getline(cLineNo)
-
+  let cl = line('.') | let cc = col('.') | let cline = getline(cl)
+  let pattern = '\V\^'
   if a:iWhite
-    let cLine = StripLeft(cLine)
-    let pattern = '\s\*'.escape(cLine, '\')
+    let cline = StripLeft(cline)
+    let pattern .= '\s\*'.escape(cline, '\')
   else
-    let pattern = escape(cLine, '\')
+    let pattern .= escape(cline, '\')
   endif
-  let pattern = '\V\^'.pattern
-
-  call cursor(cLineNo - 1, 1)
-  let [l, c] = searchpos(pattern, 'bcn')
-  if l == 0
-    return ''
-  endif
-  call cursor(cLineNo, cColNo)
-
+  let [l, c] = searchpos(pattern, 'bnw')
+  if l == 0 | return '' | endif
   let r = getline(l)
-  if a:iWhite
-    let r = StripLeft(r)
-  endif
-  return strpart(r, strlen(cLine))
+  if a:iWhite | let r = StripLeft(r) | endif
+  return strpart(r, strlen(cline))
 endfun
 inoremap <c-tab> <c-r>=FindSimilar(1)<cr>
 " - visual mode
@@ -223,7 +215,7 @@ cnoremap <a-i> <right>
 cnoremap <a-a> <Home>
 cnoremap <a-t> <End>
 cnoremap <c-v> <c-R>+
-cnoremap <c-p> <c-R>*
+cnoremap <c-p> <c-R>"
 " - copy paste
 " insert before cursor, cursor moves to the end
 nnoremap p gP
@@ -255,7 +247,7 @@ nnoremap zM :set foldlevel=1<cr>
 
 " = search
 set hlsearch
-hi Search guibg=Orange2
+"hi Search guibg=Orange2
 set ignorecase
 set smartcase
 set incsearch
@@ -284,6 +276,56 @@ aug END
 
 " how many lines before/max current line to start syntax highlighting parsing
 autocmd Syntax * syn sync clear | syntax sync minlines=512 | syntax sync maxlines=512
+
+
+fun! JumpToStart(back, visual)
+  if a:visual | norm! gv
+  endif
+  norm! m'
+  let [a, b] = ['\(|\[|\{', '\)|\]|\}']
+  let patterns = [(a:back ? b : a),
+	        \ '''',
+		\ '"',
+                \ (a:back ? a : b).'|((^|\s|\w)\zs\=($|[^=]))|,|:|;|#|\/\/|\/\*|\*\/',
+		\ '(^|\s)((^\s*(el)?if)|for|while|return|def|class)',
+		\ (a:back ? '^' : '$')]
+  call map(patterns, 'substitute(v:val, ''\v(^\()|[^\\]@<=\('', ''%('', ''g'')') " all ( to %(
+  let pattern = '\v('.join(patterns, ')|(').')'
+  let baseflags = (a:back ? 'b' : '').'pW'
+  let flags = baseflags.'c'
+  while 1
+    if col('.') == (a:back ? 1 : col('$') - 1)
+      let p = 5 " same as if naturally
+      break
+    endif
+    let [l, c, p] = searchpos(pattern, flags)
+    if l == 0 | return | endif " unusual but possible
+    let flags = baseflags
+    let p -= 2
+    if p == 0 " opening brackets
+      norm! %
+      if line('.') == l && col('.') == c | break | endif " no closing
+    elseif 1 <= p && p <= 2 " balanced
+      let [l, c, p] = searchpos(patterns[p], flags)
+      if l == 0 | break | endif " no closing
+    else
+      break
+    endif
+  endwhile
+  if a:back
+    if p != 5 | call search(pattern, 'ceW') | endif " jump over closing
+    call search('\v\S', (p == 5 ? 'c' : '').'W')
+  else
+    call search('\v\S', (p == 5 ? 'c' : '').'bW')
+  endif
+endfun
+
+nnoremap <leader>ee :call JumpToStart(0, 0)<cr>
+inoremap <leader>ee <esc>`^:call JumpToStart(0, 0)<cr>a
+xnoremap <leader>ee :<c-u>call JumpToStart(0, 1)<cr>
+nnoremap <leader>bb :call JumpToStart(1, 0)<cr>
+inoremap <leader>bb <esc>:call JumpToStart(1, 0)<cr>i
+xnoremap <leader>bb :<c-u>call JumpToStart(1, 1)<cr>
 
 
 " initialize neobundle
@@ -328,57 +370,19 @@ inoremap <Nul> <C-n>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
-let g:pymode_lint_on_write = 0
-let g:pymode_rope_completion = 0
-let g:pymode_run = 0
 let g:pymode_folding = 0
-let g:pymode_motion = 0
+let g:pymode_motion = 0 " got my own
+let g:pymode_run = 0
+let g:pymode_breakpoint = 0
+let g:pymode_lint = 0
+let g:pymode_rope = 0
 "let g:pymode_rope_rename_bind = '<leader>rr'
 "let g:pymode_rope_use_function_bind = '<leader>hu'
-NeoBundle 'vim-debug'
+
+" = vim-debug
+NeoBundle 'notEvil/vim-debug'
 fun! PythonFile()
-  fun! Start(args)
-    exe 'Pyclewn pdb '.join(a:args, ' ')
-    sleep 100m
-    sleep 100m
-  endfun
-  fun! Stop(args)
-    C import sys; sys.exit(1)
-  endfun
-  fun! Command(command)
-    exe 'C '.escape(a:command, '"')
-  endfun
-  fun! PutBp(bp)
-    exe 'C'.(a:bp.temp ? 't' : '').'break '.a:bp.file.':'.a:bp.line.', '.a:bp.condition
-  endfun
-  fun! RemoveBp(bp)
-    exe 'Cclear '.a:bp.file.':'.a:bp.line
-  endfun
-  fun! ChangeBpCondition(bp, condition)
-    exe 'Ccondition '.a:bp.count.' '.a:condition
-  endfun
-  fun! SetBpEnabled(bp, enabled)
-    exe 'C'.(a:enabled ? 'enable' : 'disable').' '.a:bp.count
-  endfun
-  fun! SetBpIgnore(bp, ignore)
-    exe 'Cignore '.a:bp.count.' '.a:ignore
-  endfun
-  fun! Print(x, pretty)
-    exe 'Cp'.(a:pretty ? 'p' : '').' '.a:x
-  endfun
-  let g:debug#opts = {
-  \ 'startF': function('Start'),
-  \ 'stopF': function('Stop'),
-  \ 'commandF': function('Command'),
-  \ 'putBpF': function('PutBp'),
-  \ 'removeBpF': function('RemoveBp'),
-  \ 'changeBpConditionF': function('ChangeBpCondition'),
-  \ 'setBpEnabledF': function('SetBpEnabled'),
-  \ 'setBpIgnoreF': function('SetBpIgnore'),
-  \ 'printF': function('Print')
-  \ }
-  " without sleep commands might not get executed
-  nnoremap <leader>dr :call debug#dummy()<cr>:DebugStart <c-r>=expand('%:p')<cr><cr>
+  nnoremap <leader>dr :call debug#dummy()<cr>:DebugStart "<c-r>=expand('%:p')<cr>"<cr>
   nnoremap <leader>dq :DebugStop<cr>
   nnoremap <leader>dl :call debug#load()<cr>
   nnoremap <leader>ds :call debug#save()<cr>
@@ -391,15 +395,19 @@ fun! PythonFile()
   nnoremap <F11> :Cup<cr>
   nnoremap <F12> :Cdown<cr>
   " breakpoints
-  nnoremap <leader>d<space> :call debug#toggleHere(0)<cr>
-  nnoremap <leader>dc :DebugBp <c-r>=debug#getRecommends()<cr> 
-  nnoremap <leader>dt :call debug#toggleHere(1)<cr>
-  nnoremap <leader>dd :call debug#toggleHere(1)<cr>:Ccontinue<cr>:call debug#clearTemps()<cr>
+  nnoremap <leader>d<space> :DebugBp at :<c-r>=line('.')<cr><cr>
+  xnoremap <leader>d<space> :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr><cr>
+  nnoremap <leader>dc :DebugBp at :<c-r>=line('.')<cr> 
+  xnoremap <leader>dc :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr> 
+  nnoremap <leader>dt :DebugBp temp at :<c-r>=line('.')<cr><cr>
+  nnoremap <leader>dd :DebugBp temp at :<c-r>=line('.')<cr><cr>:Ccontinue<cr>:call debug#clearTemps()<cr>
   nnoremap <leader>de :call debug#toggleEnabled(debug#here())<cr>
-  nnoremap <leader>di :DebugBpIgnore 
+  xnoremap <leader>de :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr> enable<cr>
+  xnoremap <leader>dd :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr> disable<cr>
   " prints
   nnoremap <leader>dp :Cpp <c-r>=expand('<cword>')<cr><cr>
-  xnoremap <leader>dp ""y:Cpp <c-r>=escape(@", '"')<cr><cr>
+  nnoremap <c-cr> <cr>:C <c-r>=getline(line('.')-1)<cr><cr>
+  xnoremap <c-cr> ""y:Cpp <c-r>=escape(@", '"')<cr><cr>
   inoremap <c-cr> <c-o>on<c-o>:Cpp <c-r>=getline(line('.')-1)<cr><cr><bs>
   nnoremap <leader>dw :DebugWatch 
 endfun
@@ -421,7 +429,7 @@ omap s <Plug>(MyStreak)
 omap S <Plug>(MyStreakBackward)
 
 " = clever f
-NeoBundle 'rhysd/clever-f.vim'
+NeoBundle 'notEvil/clever-f.vim'
 let g:clever_f_chars_match_any_signs = '.'
 let g:clever_f_fix_key_direction = 1
 
@@ -441,11 +449,14 @@ let g:mwDirectGroupJumpMappingNum = 0
 " = replay
 NeoBundle 'chrisbra/Replay'
 
-" = auto pairs
-NeoBundle 'jiangmiao/auto-pairs'
-let g:AutoPairsShortcutToggle = ''
-let g:AutoPairsShortcutFastWrap = ''
-let g:AutoPairsShortcutJump = ''
+"" = auto pairs
+"NeoBundle 'jiangmiao/auto-pairs'
+"let g:AutoPairsShortcutToggle = ''
+"let g:AutoPairsShortcutFastWrap = '<leader>af'
+"let g:AutoPairsShortcutJump = ''
+"let g:AutoPairsCenterLine = 0
+"let g:AutoPairsFlyMode = 0
+"let g:AutoPairsShortcutBackInsert = '<leader>ab'
 
 " = UltiSnips
 NeoBundle 'SirVer/ultisnips'
@@ -477,42 +488,30 @@ fun! RFile()
 endfun
 au FileType r call RFile()
 
-" = Latex
-NeoBundle 'lervag/vim-latex'
-let g:tex_flavor = 'latex'
-
-" = vdebug
-NeoBundle 'joonty/vdebug.git'
-let g:vdebug_keymap = {
-\ 'run': '<leader>dr',
-\ 'run_to_cursor': '<leader>dd',
-\ 'step_over': '<F6>',
-\ 'step_into': '<F5>',
-\ 'step_out': '<F7>',
-\ 'close': '<leader>dq',
-\ 'set_breakpoint': '<leader>d<space>',
-\ 'get_context': '<F1>',
-\ 'eval_under_cursor': '<leader>dp',
-\ 'eval_visual': '<leader>dp'
-\ }
+"" = vdebug
+"NeoBundle 'joonty/vdebug.git'
+"let g:vdebug_keymap = {
+"\ 'run': '<leader>dr',
+"\ 'run_to_cursor': '<leader>dd',
+"\ 'step_over': '<F6>',
+"\ 'step_into': '<F5>',
+"\ 'step_out': '<F7>',
+"\ 'close': '<leader>dq',
+"\ 'set_breakpoint': '<leader>d<space>',
+"\ 'get_context': '<F1>',
+"\ 'eval_under_cursor': '<leader>dp',
+"\ 'eval_visual': '<leader>dp'
+"\ }
 
 
 " ycm & UltiSnips compatibility
-"inoremap <silent> <expr> <esc> (pumvisible() ? '\<c-e>' : '\<esc>') "annoying
-
 fun! g:UltiSnips_Complete()
   call UltiSnips#ExpandSnippet()
-  if g:ulti_expand_res != 0
-    return ''
-  endif
-  if pumvisible()
-    " \" != ' ;)
-    return "\<c-n>"
+  if g:ulti_expand_res != 0 | return '' | endif
+  if pumvisible() | return "\<c-n>" " \" != ' ;)
   endif
   call UltiSnips#JumpForwards()
-  if g:ulti_jump_forwards_res != 0
-    return ''
-  endif
+  if g:ulti_jump_forwards_res != 0 | return '' | endif
   return "\<tab>"
 endfun
 
@@ -522,9 +521,6 @@ au BufNewFile,BufRead * inoremap <silent> <tab> <c-R>=g:UltiSnips_Complete()<cr>
 " TODO esc may not always exit insert mode, but I still don't know why
 au BufNewFile,BufRead * inoremap <silent> <esc> <esc>`^
 
-"let g:util_expand_or_jump_res=0
-"au BufNewFile,BufRead * inoremap <silent> <expr> <esc> (g:util_expand_or_jump_res != 0 ? '<esc>ab<esc>' : '<esc>')
-
 
 call neobundle#end()
 
@@ -533,6 +529,5 @@ call neobundle#end()
 filetype plugin indent on " required!
 
 NeoBundleCheck
-
 
 
