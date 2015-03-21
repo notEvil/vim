@@ -31,8 +31,8 @@ set guioptions-=b " remove bottom scrollbar
 
 if has('gui_running') && has('gui_win32') " in gvim, on windows
     aug _maximize
-	au!
-	au GUIEnter * simalt ~x " start maximized
+        au!
+        au GUIEnter * simalt ~x " start maximized
     aug END
 endif
 
@@ -59,8 +59,8 @@ fun! ColoredLineNumbers()
     let p = (line('.') - 1.0) / (endLNr - 1)
 
     let colors = [[255, 0, 0],
-		\ [0, 255, 0],
-		\ [0, 0, 255]]
+                \ [0, 255, 0],
+                \ [0, 0, 255]]
     let end = len(colors) - 1
 
     let i = float2nr(p * end)
@@ -78,9 +78,9 @@ fun! ColoredLineNumbers()
     let bg_c = printf('%02x%02x%02x', r, g, b)
 
     if p <= 0.1 || 0.9 <= p
-	let fg_c = 'white'
+        let fg_c = 'white'
     else
-	let fg_c = 'black'
+        let fg_c = 'black'
     endif
 
     exe('hi CursorLineNr guibg=#'.bg_c.' guifg='.fg_c)
@@ -193,7 +193,7 @@ fun! FindSimilar(iWhite)
   else
     let pattern .= escape(cline, '\')
   endif
-  let [l, c] = searchpos(pattern, 'bnw')
+  let [l, c] = searchpos(pattern, 'nw')
   if l == 0 | return '' | endif
   let r = getline(l)
   if a:iWhite | let r = StripLeft(r) | endif
@@ -278,54 +278,75 @@ aug END
 autocmd Syntax * syn sync clear | syntax sync minlines=512 | syntax sync maxlines=512
 
 
-fun! JumpToStart(back, visual)
+fun! MergeSubPatterns(patterns) " assumes \v
+  let r = copy(a:patterns)
+  call map(r, 'substitute(v:val, ''\v(^\()|[^\\]@<=\('', ''%('', ''g'')') " all ( to %(
+  return '('.join(r, ')|(').')'
+endfun
+
+let s:defaultBalances = ["'", '"']
+let s:defaultPercents = ['\(|\[|\{', '\)|\]|\}']
+let s:defaultStop = '((^|\s|\w)\zs\=($|[^=])@=)|,|:|;|#|\/\/|\/\*|\*\/|^\s*((el)?if|for|while|return|def|class)\s'
+fun! JumpOverDefaults(back, visual, balances, percents, stop, breakLine)
+  return JumpOver(a:back, a:visual,
+                \ (a:percents ? s:defaultPercents : []),
+                \ (a:balances ? s:defaultBalances : []),
+                \ (a:stop ? s:defaultStop : ''),
+                \ a:breakLine)
+endfun
+
+fun! JumpOver(back, visual, percents, balances, stop, breakLine) " assumes \v
   if a:visual | norm! gv
   endif
   norm! m'
-  let [a, b] = ['\(|\[|\{', '\)|\]|\}']
+  let noPattern = '\_.@!' " const
+  let [a, b] = (len(a:percents) == 0 ? [noPattern, noPattern] : a:percents) " validate percents
+  " 0: percents, 1: stop, 2-(n-2): balances, n-1: line break
   let patterns = [(a:back ? b : a),
-	        \ '''',
-		\ '"',
-                \ (a:back ? a : b).'|((^|\s|\w)\zs\=($|[^=]))|,|:|;|#|\/\/|\/\*|\*\/',
-		\ '(^|\s)((^\s*(el)?if)|for|while|return|def|class)',
-		\ (a:back ? '^' : '$')]
-  call map(patterns, 'substitute(v:val, ''\v(^\()|[^\\]@<=\('', ''%('', ''g'')') " all ( to %(
-  let pattern = '\v('.join(patterns, ')|(').')'
-  let baseflags = (a:back ? 'b' : '').'pW'
-  let flags = baseflags.'c'
+                \ join([(a:back ? a : b)] + (strlen(a:stop) == 0 ? [] : [a:stop]), '|')]
+  call extend(patterns, a:balances)
+  if a:breakLine | call add(patterns, (a:back ? '^' : '$')) | endif
+  let pattern = '\v'.MergeSubPatterns(patterns)
+  let pLineBreak = (a:breakLine ? len(patterns) - 1 : -1)
+  let baseFlags = (a:back ? 'b' : '').'pW'
+  let flags = baseFlags.'c'
   while 1
-    if col('.') == (a:back ? 1 : col('$') - 1)
-      let p = 5 " same as if naturally
+    if a:breakLine && col('.') == (a:back ? 1 : col('$') - 1) " some workaround
+      let p = pLineBreak " same as natural line break
       break
     endif
     let [l, c, p] = searchpos(pattern, flags)
-    if l == 0 | return | endif " unusual but possible
-    let flags = baseflags
+    if l == 0 | return [0, 0] | endif " unusual but possible
     let p -= 2
-    if p == 0 " opening brackets
+    let flags = baseFlags
+    if p == 0 " percent
       norm! %
       if line('.') == l && col('.') == c | break | endif " no closing
-    elseif 1 <= p && p <= 2 " balanced
-      let [l, c, p] = searchpos(patterns[p], flags)
-      if l == 0 | break | endif " no closing
-    else
+    elseif p == 1 || p == pLineBreak " stop or line break
       break
+    else " balance
+      let [l, c, p] = searchpos('\v'.patterns[p], flags)
+      if l == 0 | break | endif " no closing
     endif
   endwhile
+  let r = [line('.'), col('.')]
   if a:back
-    if p != 5 | call search(pattern, 'ceW') | endif " jump over closing
-    call search('\v\S', (p == 5 ? 'c' : '').'W')
+    if p != pLineBreak | call search(pattern, 'ceW') | endif " jump over closing
+    call search('\v\S', (p == pLineBreak ? 'c' : '').'W')
   else
-    call search('\v\S', (p == 5 ? 'c' : '').'bW')
+    call search('\v\S', (p == pLineBreak ? 'c' : '').'bW')
   endif
+  return r
 endfun
 
-nnoremap <leader>ee :call JumpToStart(0, 0)<cr>
-inoremap <leader>ee <esc>`^:call JumpToStart(0, 0)<cr>a
-xnoremap <leader>ee :<c-u>call JumpToStart(0, 1)<cr>
-nnoremap <leader>bb :call JumpToStart(1, 0)<cr>
-inoremap <leader>bb <esc>:call JumpToStart(1, 0)<cr>i
-xnoremap <leader>bb :<c-u>call JumpToStart(1, 1)<cr>
+nnoremap <leader>ee :call JumpOverDefaults(0, 0, 1, 1, 1, 1)<cr>
+inoremap <leader>ee <esc>`^:call JumpOverDefaults(0, 0, 1, 1, 1, 1)<cr>a
+xnoremap <leader>ee :<c-u>call JumpOverDefaults(0, 1, 1, 1, 1, 1)<cr>
+nnoremap <leader>bb :call JumpOverDefaults(1, 0, 1, 1, 1, 1)<cr>
+inoremap <leader>bb <esc>:call JumpOverDefaults(1, 0, 1, 1, 1, 1)<cr>i
+xnoremap <leader>bb :<c-u>call JumpOverDefaults(1, 1, 1, 1, 1, 1)<cr>
+xnoremap iB <esc>:call JumpOverDefaults(1, 0, 1, 1, 1, 1)<cr>v:<c-u>call JumpOverDefaults(0, 1, 1, 1, 1, 1)<cr>
+onoremap iB :normal viB<cr>
 
 
 " initialize neobundle
@@ -364,6 +385,7 @@ NeoBundle 'Valloric/YouCompleteMe'
 let g:ycm_key_list_select_completion = ['<tab>']
 let g:ycm_key_list_previous_completion = ['<s-tab>']
 let g:ycm_use_ultisnips_completer = 0
+let g:ycm_goto_buffer_command = 'new-tab'
 " it's not possible to remap gd
 nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 inoremap <Nul> <C-n>
@@ -421,6 +443,14 @@ NeoBundle 'notEvil/vim-sneak'
 let g:sneak#use_ic_scs = 1 " smartcase
 let g:sneak#s2ws = 2
 let g:sneak#dot2any = 1
+let g:sneak#myopt = {
+\   'labels': {
+\     'main': 'tnseriao',
+\     'above': 'plfuwyq;gj',
+\     'below': 'dhvkcmx,z.',
+\     'extra': '234567890'
+\   }
+\ }
 nmap s <Plug>(MyStreak)
 nmap S <Plug>(MyStreakBackward)
 xmap s <Plug>(MyStreak)
@@ -457,6 +487,15 @@ NeoBundle 'chrisbra/Replay'
 "let g:AutoPairsCenterLine = 0
 "let g:AutoPairsFlyMode = 0
 "let g:AutoPairsShortcutBackInsert = '<leader>ab'
+fun! FindClosing(forward)
+  let win = winsaveview()
+  let [l, c] = JumpOver(!a:forward, 0, s:defaultPercents, s:defaultBalances, '', 0)
+  let r = strpart(getline(l), c - 1, 1)
+  call winrestview(win)
+  return get((a:forward ? {')': '(', ']': '[', '}': '{'} : {'(': ')', '[': ']', '{': '}'}), r, '')
+endfun
+inoremap <a-[> (
+inoremap <a-]> <c-r>=FindClosing(0)<cr>
 
 " = UltiSnips
 NeoBundle 'SirVer/ultisnips'
@@ -478,13 +517,12 @@ fun! RFile()
   nmap <leader>rr <Plug>RStart
   nmap <leader>rq <Plug>RClose
   nmap <c-cr> <Plug>RDSendLine
-  xmap <c-cr> <Plug>RSendSelection
+  xmap <c-cr> <Plug>RESendSelection
   imap <c-cr> <Plug>RSendLine
   nmap <leader>rh <Plug>RHelp
   nmap <leader>rs <Plug>RObjectStr
   nmap <leader>rc <Plug>RClearAll
   inoremap $ $<c-x><c-o><c-p>
-  inoremap . .<c-x><c-o><c-p>
 endfun
 au FileType r call RFile()
 
