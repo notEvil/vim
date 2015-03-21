@@ -19,9 +19,6 @@ set nowrap
 "source $VIMRUNTIME/mswin.vim
 "behave mswin
 
-"set backspace=indent,eol,start " not very vi like
-set backspace=indent,start
-
 
 " - gui
 set guioptions-=T " remove toolbar
@@ -32,37 +29,38 @@ set guioptions-=l " remove left scrollbar
 set guioptions-=L
 set guioptions-=b " remove bottom scrollbar
 
-if has("gui_running") && has("gui_win32") " in gvim, on windows
+if has('gui_running') && has('gui_win32') " in gvim, on windows
     aug _maximize
-	au!
-	au GUIEnter * simalt ~x " start maximized
+        au!
+        au GUIEnter * simalt ~x " start maximized
     aug END
 endif
 
 
 " = visual
 " - colors
-colorscheme wombat
 set background=dark
+set t_Co=256
+colorscheme wombat256mod
 " - font
-if has("gui_running")
-  if has("gui_win32")
+if has('gui_running')
+  if has('gui_win32')
     set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
   else
     set guifont=Inconsolata\ 11
   endif
 endif
 " - colored line number
-func! Interpolate(p, fro, to)
+fun! Interpolate(p, fro, to)
     return a:fro + a:p * (a:to - a:fro)
-endf
-func! ColoredLineNumbers()
+endfun
+fun! ColoredLineNumbers()
     let endLNr = max([2, line('$')]) " avoid div by zero
     let p = (line('.') - 1.0) / (endLNr - 1)
 
     let colors = [[255, 0, 0],
-		\ [0, 255, 0],
-		\ [0, 0, 255]]
+                \ [0, 255, 0],
+                \ [0, 0, 255]]
     let end = len(colors) - 1
 
     let i = float2nr(p * end)
@@ -80,22 +78,24 @@ func! ColoredLineNumbers()
     let bg_c = printf('%02x%02x%02x', r, g, b)
 
     if p <= 0.1 || 0.9 <= p
-	let fg_c = 'white'
+        let fg_c = 'white'
     else
-	let fg_c = 'black'
+        let fg_c = 'black'
     endif
 
     exe('hi CursorLineNr guibg=#'.bg_c.' guifg='.fg_c)
-endf
-
+endfun
 aug _colorLineNr
     au!
     au CursorMoved * call ColoredLineNumbers()
 aug END
 
 " = key mappings
-let mapleader = ";"
-let maplocalleader = ";"
+let mapleader = ';'
+let maplocalleader = ';'
+" = switch black/white
+nnoremap <leader>td :colorscheme wombat256mod<cr>
+nnoremap <leader>tl :colorscheme sienna<cr>
 " - buffers
 nnoremap <c-q> :q<cr>
 nnoremap <c-h> <c-w>h
@@ -106,18 +106,21 @@ nnoremap <up> <c-w>-
 nnoremap <down> <c-w>+
 nnoremap <left> <c-w><
 nnoremap <right> <c-w>>
+nnoremap <a-up> 5<c-w>-
+nnoremap <a-down> 5<c-w>+
+nnoremap <a-left> 10<c-w><
+nnoremap <a-right> 10<c-w>>
 " copy buffer path to clipboard
 nnoremap <leader>yy :let @+ = expand('%:p')<cr>
 " open path from clipboard
-nnoremap <leader>pp :e <c-R>+<cr>
+nnoremap <leader>pp :e <c-R>=escape(@+, ' ')<cr><cr>
 " - tabs
 nnoremap <c-t> :tabnew<cr>
 nnoremap <c-f4> :tabclose<cr>
 nnoremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
 au TabLeave * let g:lasttab = tabpagenr()
-nnoremap <silent> <c-j> :exe "tabn ".g:lasttab<cr>
-xnoremap <silent> <c-j> :exe "tabn ".g:lasttab<cr>
+nnoremap <c-j> :tabn <c-r>=g:lasttab<cr><cr>
 nnoremap <c-F1> 1gt
 nnoremap <c-F2> 2gt
 nnoremap <c-F3> 3gt
@@ -140,6 +143,8 @@ xnoremap <a-n> j
 xnoremap <a-e> k
 xnoremap <a-i> l
 nnoremap # ^
+nnoremap <a-a> ^
+nnoremap <a-t> $
 nnoremap <space> <c-d>
 xnoremap <space> <c-d>
 nnoremap <s-space> <c-u>
@@ -150,6 +155,7 @@ nnoremap <c-o> <c-i>
 " . save
 nnoremap <c-s> :update<cr>
 inoremap <c-s> <c-o>:update<cr>
+xnoremap <c-s> :<c-u>update<cr>gv
 " - regex
 nnoremap / /\v
 xnoremap / /\v
@@ -158,23 +164,42 @@ xnoremap ? ?\v
 nnoremap R :%s///g<left><left>
 xnoremap R :s///g<left><left>
 nnoremap // :nohlsearch<cr>
-noremap - #
-noremap = *
+nnoremap - #
+nnoremap = *
 xnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
 xnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
 " - insert mode
-inoremap <silent> <esc> <esc>`^
+"inoremap <silent> <esc> <esc>`^ " see ultisnips
 inoremap <a-h> <left>
 inoremap <a-n> <down>
 inoremap <a-e> <up>
 inoremap <a-i> <right>
+inoremap <a-a> <c-O>^
+inoremap <a-t> <c-O>$
 inoremap <c-h> <bs>
 inoremap <c-i> <del>
 inoremap <c-n> <esc>m`O<esc>``a
 inoremap <c-e> <esc>m`kdd``a
 inoremap <c-p> <c-R>"
-inoremap <a-a> <c-O>^
-inoremap <a-t> <c-O>$
+fun! StripLeft(x)
+  return substitute(a:x, '\v(^\s+)', '', 'g')
+endfun
+fun! FindSimilar(iWhite)
+  let cl = line('.') | let cc = col('.') | let cline = getline(cl)
+  let pattern = '\V\^'
+  if a:iWhite
+    let cline = StripLeft(cline)
+    let pattern .= '\s\*'.escape(cline, '\')
+  else
+    let pattern .= escape(cline, '\')
+  endif
+  let [l, c] = searchpos(pattern, 'nw')
+  if l == 0 | return '' | endif
+  let r = getline(l)
+  if a:iWhite | let r = StripLeft(r) | endif
+  return strpart(r, strlen(cline))
+endfun
+inoremap <c-tab> <c-r>=FindSimilar(1)<cr>
 " - visual mode
 nnoremap vv <c-v>
 xnoremap <c-n> <esc>`<O<esc>`>jddgv
@@ -190,7 +215,7 @@ cnoremap <a-i> <right>
 cnoremap <a-a> <Home>
 cnoremap <a-t> <End>
 cnoremap <c-v> <c-R>+
-cnoremap <c-p> <c-R>*
+cnoremap <c-p> <c-R>"
 " - copy paste
 " insert before cursor, cursor moves to the end
 nnoremap p gP
@@ -213,7 +238,7 @@ xnoremap <c-v> d"+gP
 set softtabstop=4
 set shiftwidth=4
 set autoindent
-inoremap <s-tab> <c-v><tab> " TODO: not working
+"inoremap <s-tab> <c-v><tab> " TODO not working
 " = folds
 set foldmethod=indent
 set foldlevelstart=1
@@ -222,7 +247,7 @@ nnoremap zM :set foldlevel=1<cr>
 
 " = search
 set hlsearch
-hi Search guibg=Orange2
+"hi Search guibg=Orange2
 set ignorecase
 set smartcase
 set incsearch
@@ -239,20 +264,89 @@ au BufNewFile,BufRead *.swg set filetype=swig
 let g:LargeFileLimit = 1024 * 1024 * 50 " 50 MB
 
 " Protect large files from sourcing and other overhead. Set read only
-if !exists("my_auto_commands_loaded")
-    let my_auto_commands_loaded = 1
-    " noswapfile (save copy of file)
-    " bufhidden=unload (save memory when other file is viewed)
-    " buftype=nowritefile (is read-only)
-    " undolevels=-1 (no undo possible)
-    augroup LargeFile
-        " dont need eventignore+=FileType cuz we set syntax sync minlines, maxlines
-        autocmd BufReadPre * let f=expand("<afile>") | if getfsize(f) > g:LargeFileLimit | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | endif
-    augroup END
-endif
+" noswapfile (save copy of file)
+" bufhidden=unload (save memory when other file is viewed)
+" buftype=nowritefile (is read-only)
+" undolevels=-1 (no undo possible)
+aug LargeFile
+    au!
+    " dont need eventignore+=FileType cuz we set syntax sync minlines, maxlines
+    autocmd BufReadPre * let f=expand('<afile>') | if getfsize(f) > g:LargeFileLimit | setlocal noswapfile bufhidden=unload buftype=nowrite undolevels=-1 | endif
+aug END
 
 " how many lines before/max current line to start syntax highlighting parsing
 autocmd Syntax * syn sync clear | syntax sync minlines=512 | syntax sync maxlines=512
+
+
+fun! MergeSubPatterns(patterns) " assumes \v
+  let r = copy(a:patterns)
+  call map(r, 'substitute(v:val, ''\v(^\()|[^\\]@<=\('', ''%('', ''g'')') " all ( to %(
+  return '('.join(r, ')|(').')'
+endfun
+
+let s:defaultBalances = ["'", '"']
+let s:defaultPercents = ['\(|\[|\{', '\)|\]|\}']
+let s:defaultStop = '((^|\s|\w)\zs\=($|[^=])@=)|,|:|;|#|\/\/|\/\*|\*\/|^\s*((el)?if|for|while|return|def|class)\s'
+fun! JumpOverDefaults(back, visual, balances, percents, stop, breakLine)
+  return JumpOver(a:back, a:visual,
+                \ (a:percents ? s:defaultPercents : []),
+                \ (a:balances ? s:defaultBalances : []),
+                \ (a:stop ? s:defaultStop : ''),
+                \ a:breakLine)
+endfun
+
+fun! JumpOver(back, visual, percents, balances, stop, breakLine) " assumes \v
+  if a:visual | norm! gv
+  endif
+  norm! m'
+  let noPattern = '\_.@!' " const
+  let [a, b] = (len(a:percents) == 0 ? [noPattern, noPattern] : a:percents) " validate percents
+  " 0: percents, 1: stop, 2-(n-2): balances, n-1: line break
+  let patterns = [(a:back ? b : a),
+                \ join([(a:back ? a : b)] + (strlen(a:stop) == 0 ? [] : [a:stop]), '|')]
+  call extend(patterns, a:balances)
+  if a:breakLine | call add(patterns, (a:back ? '^' : '$')) | endif
+  let pattern = '\v'.MergeSubPatterns(patterns)
+  let pLineBreak = (a:breakLine ? len(patterns) - 1 : -1)
+  let baseFlags = (a:back ? 'b' : '').'pW'
+  let flags = baseFlags.'c'
+  while 1
+    if a:breakLine && col('.') == (a:back ? 1 : col('$') - 1) " some workaround
+      let p = pLineBreak " same as natural line break
+      break
+    endif
+    let [l, c, p] = searchpos(pattern, flags)
+    if l == 0 | return [0, 0] | endif " unusual but possible
+    let p -= 2
+    let flags = baseFlags
+    if p == 0 " percent
+      norm! %
+      if line('.') == l && col('.') == c | break | endif " no closing
+    elseif p == 1 || p == pLineBreak " stop or line break
+      break
+    else " balance
+      let [l, c, p] = searchpos('\v'.patterns[p], flags)
+      if l == 0 | break | endif " no closing
+    endif
+  endwhile
+  let r = [line('.'), col('.')]
+  if a:back
+    if p != pLineBreak | call search(pattern, 'ceW') | endif " jump over closing
+    call search('\v\S', (p == pLineBreak ? 'c' : '').'W')
+  else
+    call search('\v\S', (p == pLineBreak ? 'c' : '').'bW')
+  endif
+  return r
+endfun
+
+nnoremap <leader>ee :call JumpOverDefaults(0, 0, 1, 1, 1, 1)<cr>
+inoremap <leader>ee <esc>`^:call JumpOverDefaults(0, 0, 1, 1, 1, 1)<cr>a
+xnoremap <leader>ee :<c-u>call JumpOverDefaults(0, 1, 1, 1, 1, 1)<cr>
+nnoremap <leader>bb :call JumpOverDefaults(1, 0, 1, 1, 1, 1)<cr>
+inoremap <leader>bb <esc>:call JumpOverDefaults(1, 0, 1, 1, 1, 1)<cr>i
+xnoremap <leader>bb :<c-u>call JumpOverDefaults(1, 1, 1, 1, 1, 1)<cr>
+xnoremap iB <esc>:call JumpOverDefaults(1, 0, 1, 1, 1, 1)<cr>v:<c-u>call JumpOverDefaults(0, 1, 1, 1, 1, 1)<cr>
+onoremap iB :normal viB<cr>
 
 
 " initialize neobundle
@@ -274,7 +368,7 @@ set laststatus=2
 set noshowmode
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#tab_nr_type = 1
-let g:airline_theme="powerlineish"
+let g:airline_theme='powerlineish'
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
 
@@ -291,19 +385,55 @@ NeoBundle 'Valloric/YouCompleteMe'
 let g:ycm_key_list_select_completion = ['<tab>']
 let g:ycm_key_list_previous_completion = ['<s-tab>']
 let g:ycm_use_ultisnips_completer = 0
+let g:ycm_goto_buffer_command = 'new-tab'
 " it's not possible to remap gd
 nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 inoremap <Nul> <C-n>
 
 " = python-mode
 NeoBundle 'klen/python-mode'
-let g:pymode_lint_on_write = 0
-let g:pymode_rope_completion = 0
-let g:pymode_run_key = ''
 let g:pymode_folding = 0
-let g:pymode_motion = 0
-let g:pymode_rope_rename_bind = '<leader>rr'
-let g:pymode_rope_use_function_bind = '<leader>hu'
+let g:pymode_motion = 0 " got my own
+let g:pymode_run = 0
+let g:pymode_breakpoint = 0
+let g:pymode_lint = 0
+let g:pymode_rope = 0
+"let g:pymode_rope_rename_bind = '<leader>rr'
+"let g:pymode_rope_use_function_bind = '<leader>hu'
+
+" = vim-debug
+NeoBundle 'notEvil/vim-debug'
+fun! PythonFile()
+  nnoremap <leader>dr :call debug#dummy()<cr>:DebugStart "<c-r>=expand('%:p')<cr>"<cr>
+  nnoremap <leader>dq :DebugStop<cr>
+  nnoremap <leader>dl :call debug#load()<cr>
+  nnoremap <leader>ds :call debug#save()<cr>
+  nnoremap <c-c> :Cinterrupt<cr>
+  nnoremap <F1> :call debug#printWatch()<cr>
+  nnoremap <F5> :Cstep<cr>
+  nnoremap <F6> :Cnext<cr>
+  nnoremap <F7> :Creturn<cr>:call debug#clearTemps()<cr>
+  nnoremap <F8> :Ccontinue<cr>:call debug#clearTemps()<cr>
+  nnoremap <F11> :Cup<cr>
+  nnoremap <F12> :Cdown<cr>
+  " breakpoints
+  nnoremap <leader>d<space> :DebugBp at :<c-r>=line('.')<cr><cr>
+  xnoremap <leader>d<space> :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr><cr>
+  nnoremap <leader>dc :DebugBp at :<c-r>=line('.')<cr> 
+  xnoremap <leader>dc :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr> 
+  nnoremap <leader>dt :DebugBp temp at :<c-r>=line('.')<cr><cr>
+  nnoremap <leader>dd :DebugBp temp at :<c-r>=line('.')<cr><cr>:Ccontinue<cr>:call debug#clearTemps()<cr>
+  nnoremap <leader>de :call debug#toggleEnabled(debug#here())<cr>
+  xnoremap <leader>de :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr> enable<cr>
+  xnoremap <leader>dd :DebugBp range :<c-r>=line("'<")<cr> :<c-r>=line("'>")<cr> disable<cr>
+  " prints
+  nnoremap <leader>dp :Cpp <c-r>=expand('<cword>')<cr><cr>
+  nnoremap <c-cr> <cr>:C <c-r>=getline(line('.')-1)<cr><cr>
+  xnoremap <c-cr> ""y:Cpp <c-r>=escape(@", '"')<cr><cr>
+  inoremap <c-cr> <c-o>on<c-o>:Cpp <c-r>=getline(line('.')-1)<cr><cr><bs>
+  nnoremap <leader>dw :DebugWatch 
+endfun
+au FileType python call PythonFile()
 
 " = NERDcommenter
 NeoBundle 'scrooloose/nerdcommenter'
@@ -313,6 +443,14 @@ NeoBundle 'notEvil/vim-sneak'
 let g:sneak#use_ic_scs = 1 " smartcase
 let g:sneak#s2ws = 2
 let g:sneak#dot2any = 1
+let g:sneak#myopt = {
+\   'labels': {
+\     'main': 'tnseriao',
+\     'above': 'plfuwyq;gj',
+\     'below': 'dhvkcmx,z.',
+\     'extra': '234567890'
+\   }
+\ }
 nmap s <Plug>(MyStreak)
 nmap S <Plug>(MyStreakBackward)
 xmap s <Plug>(MyStreak)
@@ -321,7 +459,7 @@ omap s <Plug>(MyStreak)
 omap S <Plug>(MyStreakBackward)
 
 " = clever f
-NeoBundle 'rhysd/clever-f.vim'
+NeoBundle 'notEvil/clever-f.vim'
 let g:clever_f_chars_match_any_signs = '.'
 let g:clever_f_fix_key_direction = 1
 
@@ -341,53 +479,85 @@ let g:mwDirectGroupJumpMappingNum = 0
 " = replay
 NeoBundle 'chrisbra/Replay'
 
-" = auto pairs
-NeoBundle 'jiangmiao/auto-pairs'
-let g:AutoPairsShortcutToggle = ''
-let g:AutoPairsShortcutFastWrap = ''
-let g:AutoPairsShortcutJump = ''
+"" = auto pairs
+"NeoBundle 'jiangmiao/auto-pairs'
+"let g:AutoPairsShortcutToggle = ''
+"let g:AutoPairsShortcutFastWrap = '<leader>af'
+"let g:AutoPairsShortcutJump = ''
+"let g:AutoPairsCenterLine = 0
+"let g:AutoPairsFlyMode = 0
+"let g:AutoPairsShortcutBackInsert = '<leader>ab'
+fun! FindClosing(forward)
+  let win = winsaveview()
+  let [l, c] = JumpOver(!a:forward, 0, s:defaultPercents, s:defaultBalances, '', 0)
+  let r = strpart(getline(l), c - 1, 1)
+  call winrestview(win)
+  return get((a:forward ? {')': '(', ']': '[', '}': '{'} : {'(': ')', '[': ']', '{': '}'}), r, '')
+endfun
+inoremap <a-[> (
+inoremap <a-]> <c-r>=FindClosing(0)<cr>
 
 " = UltiSnips
 NeoBundle 'SirVer/ultisnips'
 let g:UltiSnipsEditSplit = 'vertical'
-let g:UltiSnipsExpandTrigger = "<tab>"
-let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+let g:UltiSnipsExpandTrigger = '<tab>'
+let g:UltiSnipsJumpForwardTrigger = '<tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
+let g:UltiSnipsListSnippets = '<Nop>'
 
 " = vim-snippets
 NeoBundle 'honza/vim-snippets'
 
-"" = YankRing
-"NeoBundle 'vim-scripts/YankRing.vim'
-"let yankring_replace_n_pkey = '<a-p>'
-"let yankring_replace_n_nkey = ''
-
 " = R
-NeoBundle 'vim-scripts/Vim-R-plugin'
-xnoremap <leader-rr> <Plug>RDSendSelection
-nnoremap <leader-rr> <Plug>RDSendLine
+"NeoBundle 'vim-scripts/Vim-R-plugin'
+NeoBundle 'jcfaria/Vim-R-plugin'
+let g:vimrplugin_user_maps_only = 1
+let g:vimrplugin_assign = 0
+fun! RFile()
+  nmap <leader>rr <Plug>RStart
+  nmap <leader>rq <Plug>RClose
+  nmap <c-cr> <Plug>RDSendLine
+  xmap <c-cr> <Plug>RESendSelection
+  imap <c-cr> <Plug>RSendLine
+  nmap <leader>rh <Plug>RHelp
+  nmap <leader>rs <Plug>RObjectStr
+  nmap <leader>rc <Plug>RClearAll
+  inoremap $ $<c-x><c-o><c-p>
+endfun
+au FileType r call RFile()
 
+"" = vdebug
+"NeoBundle 'joonty/vdebug.git'
+"let g:vdebug_keymap = {
+"\ 'run': '<leader>dr',
+"\ 'run_to_cursor': '<leader>dd',
+"\ 'step_over': '<F6>',
+"\ 'step_into': '<F5>',
+"\ 'step_out': '<F7>',
+"\ 'close': '<leader>dq',
+"\ 'set_breakpoint': '<leader>d<space>',
+"\ 'get_context': '<F1>',
+"\ 'eval_under_cursor': '<leader>dp',
+"\ 'eval_visual': '<leader>dp'
+"\ }
 
 
 " ycm & UltiSnips compatibility
-"inoremap <silent> <expr> <esc> (pumvisible() ? '\<c-e>' : '\<esc>') "annoying
-
-function! g:UltiSnips_Complete()
+fun! g:UltiSnips_Complete()
   call UltiSnips#ExpandSnippet()
-  if g:ulti_expand_res == 0
-    if pumvisible()
-      return "\<C-n>"
-    else
-      call UltiSnips#JumpForwards()
-      if g:ulti_jump_forwards_res == 0
-        return "\<TAB>"
-      endif
-    endif
+  if g:ulti_expand_res != 0 | return '' | endif
+  if pumvisible() | return "\<c-n>" " \" != ' ;)
   endif
-  return ""
-endfunction
+  call UltiSnips#JumpForwards()
+  if g:ulti_jump_forwards_res != 0 | return '' | endif
+  return "\<tab>"
+endfun
 
-au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+" either ycm or ultisnips remap <tab> somewhere => au
+" TODO doesn't seem to work when opening file from cmd line
+au BufNewFile,BufRead * inoremap <silent> <tab> <c-R>=g:UltiSnips_Complete()<cr>
+" TODO esc may not always exit insert mode, but I still don't know why
+au BufNewFile,BufRead * inoremap <silent> <esc> <esc>`^
 
 
 call neobundle#end()
