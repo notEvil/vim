@@ -96,6 +96,8 @@ let maplocalleader = ';'
 " = switch black/white
 nnoremap <leader>td :colorscheme wombat256mod<cr>
 nnoremap <leader>tl :colorscheme sienna<cr>
+" - nop
+nnoremap Q <nop>
 " - buffers
 nnoremap <c-q> :q<cr>
 nnoremap <c-h> <c-w>h
@@ -120,19 +122,17 @@ nnoremap <c-f4> :tabclose<cr>
 nnoremap <c-tab> :tabnext<cr>
 nnoremap <c-s-tab> :tabprevious<cr>
 au TabLeave * let g:lasttab = tabpagenr()
-nnoremap <c-j> :tabn <c-r>=g:lasttab<cr><cr>
-nnoremap <c-F1> 1gt
-nnoremap <c-F2> 2gt
-nnoremap <c-F3> 3gt
-nnoremap <c-F4> 4gt
-nnoremap <c-F5> 5gt
-nnoremap <c-F6> 6gt
-nnoremap <c-F7> 7gt
-nnoremap <c-F8> 8gt
-nnoremap <c-F9> 9gt
-nnoremap <c-F10> 10gt
-nnoremap <c-F11> :tabmove -1<cr>
-nnoremap <c-F12> :tabmove +1<cr>
+nnoremap <a-j> :tabn <c-r>=g:lasttab<cr><cr>
+nnoremap <a-1> 1gt
+nnoremap <a-2> 2gt
+nnoremap <a-3> 3gt
+nnoremap <a-4> 4gt
+nnoremap <a-5> 5gt
+nnoremap <a-6> 6gt
+nnoremap <a-7> 7gt
+nnoremap <a-8> 8gt
+nnoremap <a-9> :tabmove -1<cr>
+nnoremap <a-0> :tabmove +1<cr>
 " - navigation
 nnoremap <a-h> h
 nnoremap <a-n> j
@@ -517,7 +517,7 @@ fun! RFile()
   nmap <leader>rr <Plug>RStart
   nmap <leader>rq <Plug>RClose
   nmap <c-cr> <Plug>RDSendLine
-  xmap <c-cr> <Plug>RESendSelection
+  xmap <c-cr> <Plug>RDSendSelection
   imap <c-cr> <Plug>RSendLine
   nmap <leader>rh <Plug>RHelp
   nmap <leader>rs <Plug>RObjectStr
