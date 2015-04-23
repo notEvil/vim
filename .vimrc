@@ -19,6 +19,16 @@ set nowrap
 "source $VIMRUNTIME/mswin.vim
 "behave mswin
 
+" = enable ALT key combinations in terminal
+let c='a'
+while c <= 'z'
+  exec "set <A-".c.">=\e".c
+  exec "imap \e".c." <A-".c.">"
+  let c = nr2char(1+char2nr(c))
+endw
+
+set timeout ttimeoutlen=50
+
 
 " - gui
 set guioptions-=T " remove toolbar
@@ -567,5 +577,4 @@ call neobundle#end()
 filetype plugin indent on " required!
 
 NeoBundleCheck
-
 
