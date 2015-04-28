@@ -247,6 +247,7 @@ xnoremap <c-v> d"+gP
 " = indent
 set softtabstop=4
 set shiftwidth=4
+set expandtab
 set autoindent
 "inoremap <s-tab> <c-v><tab> " TODO not working
 " = folds
