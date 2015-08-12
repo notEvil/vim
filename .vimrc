@@ -56,7 +56,7 @@ if has('gui_running')
   if has('gui_win32')
     set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
   else
-    set guifont=Inconsolata\ 11
+    set guifont=Inconsolata\ 12
   endif
 endif
 " - colored line number
@@ -529,7 +529,7 @@ fun! RFile()
   nmap <leader>rq <Plug>RClose
   nmap <cr> <Plug>RDSendLine
   xmap <cr> <Plug>RDSendSelection
-  "imap <cr> <Plug>RSendLine
+  imap <s-cr> <Plug>RSendLine
   nmap <leader>rh <Plug>RHelp
   nmap <leader>rs <Plug>RObjectStr
   nmap <leader>rc <Plug>RClearAll
