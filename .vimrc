@@ -51,6 +51,9 @@ endif
 set background=dark
 set t_Co=256
 colorscheme wombat256mod
+if &term =~ '256color' " fix bg color in tmux
+  set t_ut=
+endif
 " - font
 if has('gui_running')
   if has('gui_win32')
@@ -412,6 +415,7 @@ let g:pymode_rope = 0
 "let g:pymode_rope_use_function_bind = '<leader>hu'
 
 " = vim-debug
+NeoBundle 'pyclewn'
 NeoBundle 'notEvil/vim-debug'
 fun! PythonFile()
   nnoremap <leader>dr :call debug#dummy()<cr>:DebugStart "<c-r>=expand('%:p')<cr>"<cr>
@@ -524,16 +528,24 @@ NeoBundle 'jcfaria/Vim-R-plugin'
 let g:vimrplugin_user_maps_only = 1
 let g:vimrplugin_assign = 0
 let g:vimrplugin_source_args = 'max.deparse.length = 300, echo = TRUE'
+let g:vimrplugin_rmhidden = 1
+fun! RRunTill()
+  let w = winsaveview()
+  exec "normal \<Plug>RClearAll"
+  norm! Vgg
+  exec "normal \<Plug>RDSendSelection"
+  call winrestview(w)
+endfun
 fun! RFile()
   nmap <leader>rr <Plug>RStart
   nmap <leader>rq <Plug>RClose
   nmap <cr> <Plug>RDSendLine
   xmap <cr> <Plug>RDSendSelection
-  "imap <cr> <Plug>RSendLine
+  imap <s-cr> <Plug>RSendLine
   nmap <leader>rh <Plug>RHelp
   nmap <leader>rs <Plug>RObjectStr
   nmap <leader>rc <Plug>RClearAll
-  nmap <leader>r<cr> <leader>rcVgg<cr>`>
+  nmap <leader>r<cr> :call RRunTill()<cr>
   inoremap $ $<c-x><c-o><c-p>
   inoremap :: ::<c-x><c-o><c-p>
 endfun
