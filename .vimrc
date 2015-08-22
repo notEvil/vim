@@ -59,7 +59,7 @@ if has('gui_running')
   if has('gui_win32')
     set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
   else
-    set guifont=Consolas\ 12
+    set guifont=Inconsolata\ 12
   endif
 endif
 " - colored line number
