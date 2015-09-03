@@ -19,7 +19,7 @@ set nowrap
 "source $VIMRUNTIME/mswin.vim
 "behave mswin
 
-" = enable ALT key combinations in terminal
+" - enable ALT key combinations in terminal
 let c = 'abcdefghijklmnopqrstuvwxyz1234567890-=[]\o'',./'
 for cc in split(c, '\zs')
   exec "set <A-".cc.">=\e".cc
@@ -57,7 +57,7 @@ endif
 " - font
 if has('gui_running')
   if has('gui_win32')
-    set guifont=Consolas:h11 " Microsoft Font, may glitch under Unix (AA)
+    set guifont=Consolas:h11
   else
     set guifont=Consolas\ 12
   endif
@@ -102,6 +102,32 @@ aug _colorLineNr
   au CursorMoved * call ColoredLineNumbers()
 aug END
 
+
+" = indent
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set autoindent
+"inoremap <s-tab> <c-v><tab> " TODO not working
+
+" = folds
+set foldmethod=indent
+set foldlevelstart=1
+set foldnestmax=2
+nnoremap zM :set foldlevel=1<cr>
+
+" = search
+set hlsearch
+"hi Search guibg=Orange2
+set ignorecase
+set smartcase
+set incsearch
+
+" = line numbers
+set number
+set relativenumber
+
+
 " = key mappings
 let mapleader = ';'
 let maplocalleader = ';'
@@ -116,14 +142,14 @@ nnoremap <c-h> <c-w>h
 nnoremap <c-n> <c-w>j
 nnoremap <c-e> <c-w>k
 nnoremap <c-k> <c-w>l
-nnoremap <up> <c-w>-
-nnoremap <down> <c-w>+
-nnoremap <left> <c-w><
-nnoremap <right> <c-w>>
-nnoremap <a-up> 5<c-w>-
-nnoremap <a-down> 5<c-w>+
-nnoremap <a-left> 10<c-w><
-nnoremap <a-right> 10<c-w>>
+nnoremap <up> 5<c-w>-
+nnoremap <down> 5<c-w>+
+nnoremap <left> 10<c-w><
+nnoremap <right> 10<c-w>>
+nnoremap <a-up> <c-w>-
+nnoremap <a-down> <c-w>+
+nnoremap <a-left> <c-w><
+nnoremap <a-right> <c-w>>
 " copy buffer path to clipboard
 nnoremap <leader>yy :let @+ = expand('%:p')<cr>
 " open path from clipboard
@@ -197,7 +223,7 @@ fun! StripLeft(x)
   return substitute(a:x, '\v(^\s+)', '', 'g')
 endfun
 fun! FindSimilar(iWhite)
-  let cl = line('.') | let cc = col('.') | let cline = getline(cl)
+  let pos = getpos('.') | let cline = getline(pos[1])
   let pattern = '\V\^'
   if a:iWhite
     let cline = StripLeft(cline)
@@ -205,7 +231,9 @@ fun! FindSimilar(iWhite)
   else
     let pattern .= escape(cline, '\')
   endif
-  let [l, c] = searchpos(pattern, 'nw')
+  normal 0
+  let [l, c] = searchpos(pattern, 'bnw')
+  call setpos('.', pos)
   if l == 0 | return '' | endif
   let r = getline(l)
   if a:iWhite | let r = StripLeft(r) | endif
@@ -229,6 +257,9 @@ cnoremap <a-t> <End>
 cnoremap <c-v> <c-R>+
 cnoremap <c-p> <c-R>"
 " - copy paste
+nnoremap <cr> "+yyj
+nnoremap <s-cr> m`0"+y$``
+xnoremap <cr> <esc>2gn"+ygv
 " insert before cursor, cursor moves to the end
 nnoremap p gP
 " insert at the end of line, cursor moves to the entry point of the insertion
@@ -246,28 +277,6 @@ inoremap <c-v> <c-R>+
 " replace selection, move to the end
 xnoremap <c-v> d"+gP
 
-" = indent
-set softtabstop=4
-set shiftwidth=4
-set expandtab
-set autoindent
-"inoremap <s-tab> <c-v><tab> " TODO not working
-" = folds
-set foldmethod=indent
-set foldlevelstart=1
-set foldnestmax=2
-nnoremap zM :set foldlevel=1<cr>
-
-" = search
-set hlsearch
-"hi Search guibg=Orange2
-set ignorecase
-set smartcase
-set incsearch
-
-" = line numbers
-set number
-set relativenumber
 
 " = add filetypes
 au BufNewFile,BufRead *.i set filetype=swig 
@@ -299,7 +308,7 @@ endfun
 
 let s:defaultBalances = ["'", '"']
 let s:defaultPercents = ['\(|\[|\{', '\)|\]|\}']
-let s:defaultStop = '((^|\s|\w)\zs\=($|[^=])@=)|,|:|;|#|\/\/|\/\*|\*\/|^\s*((el)?if|for|while|return|def|class)\s|\sin\s'
+let s:defaultStop = '(\zs(^|[^=])\=\ze($|[^=]))|[,:;#]|\/\/|\/\*|\*\/|^\s*((el)?if|for|while|return|def|class|import|from)\s|\s(in|import|as)\s'
 fun! JumpOverDefaults(back, visual, balances, percents, stop, breakLine)
   return JumpOver(a:back, a:visual,
                 \ (a:percents ? s:defaultPercents : []),
