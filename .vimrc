@@ -415,7 +415,6 @@ let g:pymode_rope = 0
 "let g:pymode_rope_use_function_bind = '<leader>hu'
 
 " = vim-debug
-NeoBundle 'pyclewn'
 NeoBundle 'notEvil/vim-debug'
 fun! PythonFile()
   nnoremap <leader>dr :call debug#dummy()<cr>:DebugStart "<c-r>=expand('%:p')<cr>"<cr>
@@ -423,7 +422,7 @@ fun! PythonFile()
   nnoremap <leader>dl :call debug#load()<cr>
   nnoremap <leader>ds :call debug#save()<cr>
   nnoremap <c-c> :Cinterrupt<cr>
-  nnoremap <F1> :call debug#printWatch()<cr>
+  nnoremap <F4> :call debug#printWatch()<cr>
   nnoremap <F5> :Cstep<cr>
   nnoremap <F6> :Cnext<cr>
   nnoremap <F7> :Creturn<cr>:call debug#clearTemps()<cr>
