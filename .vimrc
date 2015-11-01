@@ -62,6 +62,8 @@ if has('gui_running')
     set guifont=Consolas\ 12
   endif
 endif
+" - cursor
+set cursorline
 " - colored line number
 fun! Interpolate(p, fro, to)
   return a:fro + a:p * (a:to - a:fro)
@@ -126,6 +128,10 @@ set incsearch
 " = line numbers
 set number
 set relativenumber
+
+" = splits
+set splitbelow
+set splitright
 
 
 " = key mappings
@@ -574,6 +580,8 @@ au FileType r call RFile()
 "\ 'eval_visual': '<leader>dp'
 "\ }
 
+call neobundle#end()
+
 
 " ycm & UltiSnips compatibility
 fun! g:UltiSnips_Complete()
@@ -592,8 +600,16 @@ au BufNewFile,BufRead * inoremap <silent> <tab> <c-R>=g:UltiSnips_Complete()<cr>
 " TODO esc may not always exit insert mode, but I still don't know why
 au BufNewFile,BufRead * inoremap <silent> <esc> <esc>`^
 
-
-call neobundle#end()
+" = virtual env
+"python with virtualenv support
+py << EOF
+import os
+import sys
+if 'VIRTUAL_ENV' in os.environ:
+  project_base_dir = os.environ['VIRTUAL_ENV']
+  activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+  execfile(activate_this, dict(__file__=activate_this))
+EOF
 
 
 " finish
