@@ -1,0 +1,136 @@
+source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
+set diffexpr=MyDiff()
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      if empty(&shellxquote)
+        let l:shxq_sav = ''
+        set shellxquote&
+      endif
+      let cmd = '"' . $VIMRUNTIME . '\diff"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+  if exists('l:shxq_sav')
+    let &shellxquote=l:shxq_sav
+  endif
+endfunction
+
+
+set nocompatible " be IMproved
+"filetype off " required
+
+set runtimepath+=$VIM/vimfiles/dein.vim/
+
+" = general
+set sessionoptions+=resize,winpos " restore size/position of window
+set sessionoptions-=options " do not restore temporary options
+set encoding=utf-8
+syntax on
+set nowrap
+
+set timeout ttimeoutlen=50
+
+
+" - gui
+set guioptions-=T " remove toolbar
+set guioptions-=m " remove menu
+set guioptions-=r " remove right scrollbar
+set guioptions-=R
+set guioptions-=l " remove left scrollbar
+set guioptions-=L
+set guioptions-=b " remove bottom scrollbar
+
+
+" = visual
+" - colors
+set background=dark
+colorscheme wombat256mod
+" - font
+if has('gui_running')
+  if has('gui_win32')
+    set guifont=Consolas:h11
+  else
+    set guifont=Consolas\ 12
+  endif
+endif
+" - cursor
+set cursorline
+
+
+" = key mappings
+" - buffers
+nnoremap <c-q> :q<cr>
+" - navigation
+nnoremap <space> <c-d>
+xnoremap <space> <c-d>
+nnoremap <s-space> <c-u>
+xnoremap <s-space> <c-u>
+" - regex
+nnoremap / /\v
+xnoremap / /\v
+nnoremap R :%s///g<left><left>
+xnoremap R :s///g<left><left>
+nnoremap - #
+nnoremap = *
+xnoremap - ""y?\V<c-r>=escape(@", '\')<cr><cr>gn
+xnoremap = ""y/\V<c-r>=escape(@", '\')<cr><cr>gn
+
+
+" = search
+set hlsearch
+"hi Search guibg=Orange2
+set ignorecase
+set smartcase
+set incsearch
+
+" = line numbers
+set number
+set relativenumber
+
+
+call dein#begin('$VIM/vimfiles/bundle')
+
+call dein#add('$VIM/vimfiles/dein.vim/')
+
+" = sneak
+call dein#add('notEvil/vim-sneak')
+let g:sneak#use_ic_scs = 1 " smartcase
+let g:sneak#s2ws = 2
+let g:sneak#dot2any = 1
+let g:sneak#myopt = {
+\   'labels': {
+\     'main': 'tnseriao',
+\     'above': 'plfuwyq;gj',
+\     'below': 'dhvkcmx,z.',
+\     'extra': '234567890'
+\   }
+\ }
+nmap s <Plug>(MyStreak)
+nmap S <Plug>(MyStreakBackward)
+xmap s <Plug>(MyStreak)
+xmap S <Plug>(MyStreakBackward)
+omap s <Plug>(MyStreak)
+omap S <Plug>(MyStreakBackward)
+
+
+call dein#end()
+
+filetype plugin indent on
+syntax enable
