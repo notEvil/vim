@@ -1,0 +1,34 @@
+        normal mode
+
+    general
+
+c-q: close
+c-s: save
+up,down,left,right: resize buffer/split
+//: disable search highlights
+R: replace all matches by
+-,=: search word under cursor forward,backward
+enter: copy line with linebreak to clipboard
+s-enter: copy line without linebreak to clipboard
+c-c,x: copy,cut to clipboard
+c-v: paste from clipboard
+vv: blockwise visual mode
+;ss: open startify
+;sq: save session as "temp" and close vim
+s,S: my sneak
+
+    navigation
+
+space: page down
+s-space: page up
+a-h,n,e,i: move cursor by 1
+#,$: move cursor to start,end of line
+c-i,o: jump backward,forward in jump history
+c-h,n,e,k: jump to buffer to the left,bottom,top,right
+
+    tabs
+
+c-t: clone buffer in new tab
+a-1,2,3,4,5,6,7,8: jump to tab 1,2,3,4,5,6,7,8
+a-9: move tab to the left
+a-0: move tab to the right

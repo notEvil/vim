@@ -1,8 +1,3 @@
-" = necessary
-" - text
-set encoding=utf-8
-
-
 " = general
 set nocompatible
 
@@ -57,6 +52,7 @@ set relativenumber
 set sessionoptions+=resize,winpos " restore size/position of window
 set sessionoptions-=options " do not restore temporary options
 " - text
+set encoding=utf-8
 set nowrap
 syntax on
 " - search
@@ -71,6 +67,10 @@ set incsearch
 " - buffer
 set splitbelow
 set splitright
+" - indent
+set expandtab
+set softtabstop=4
+set shiftwidth=4
 
 
 " = key maps
@@ -117,7 +117,7 @@ xnoremap = *
 nnoremap - #
 xnoremap - #
 " - tabs
-nnoremap <c-t> :tabnew<cr>
+nnoremap <c-t> :tab split<cr>
 nnoremap <a-1> 1gt
 nnoremap <a-2> 2gt
 nnoremap <a-3> 3gt
@@ -149,6 +149,10 @@ inoremap <c-v> <c-R>+
 xnoremap <c-v> d"+gP
 " - visual mode
 nnoremap vv <c-v>
+" - insert mode
+inoremap <silent> <esc> <esc>`^
+" - nop
+nnoremap Q <nop>
 
 
 " = plugins
@@ -179,7 +183,8 @@ let g:sneak#myopt = {
 \     'extra': '234567890'
 \   }
 \ }
-nmap s <Plug>(MyStreak)
+nmap s <Plug>MySneakLabel_s
+nmap S <Plug>MySneakLabel_S
 
 " = airline
 call dein#add('vim-airline/vim-airline')
@@ -195,7 +200,7 @@ let g:airline_right_sep = ''
 " = ycm
 call dein#add('Valloric/YouCompleteMe')
 nnoremap gd :YcmCompleter GoTo<cr>
-nnoremap gr :YcmCompleter GoToReferences<cr>
+"nnoremap gr :YcmCompleter GoToReferences<cr>
 "let g:ycm_key_list_select_completion = ['<tab>']
 "let g:ycm_key_list_previous_completion = ['<s-tab>']
 "let g:ycm_use_ultisnips_completer = 0
