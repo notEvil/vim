@@ -23,6 +23,38 @@ endif
 set cursorline
 " - search
 set hlsearch
+" - colored line number
+let LineColors = [[255, 0, 0],
+                \ [0, 255, 0],
+                \ [0, 0, 255]]
+fun! HighlightLinenumber()
+  let endLNr = line('$')
+  let p = (line('.') - 1.0) / ((2 < endLNr ? endLNr : 2) - 1)
+
+  let end = len(g:LineColors) - 1
+  let i = float2nr(p * end)
+  if i == end
+    let i -= 1
+  endif
+  let p2 = p * end - i
+
+  let color_from = g:LineColors[i]
+  let color_to = g:LineColors[i + 1]
+  let r = float2nr( Interpolate(p2, color_from[0], color_to[0]) )
+  let g = float2nr( Interpolate(p2, color_from[1], color_to[1]) )
+  let b = float2nr( Interpolate(p2, color_from[2], color_to[2]) )
+  let bg_c = printf('%02x%02x%02x', r, g, b)
+
+  let fg_c = (p <= 0.1 || 0.9 <= p ? 'white' : 'black')
+  exe('hi CursorLineNr guibg=#'.bg_c.' guifg='.fg_c)
+endfun
+fun! Interpolate(p, a, b)
+  return a:a + a:p * (a:b - a:a)
+endfun
+aug _highlightLinenumber
+  au!
+  au CursorMoved * call HighlightLinenumber()
+aug END
 
 
 " = ui
@@ -69,6 +101,7 @@ set splitright
 set expandtab
 set softtabstop=4
 set shiftwidth=4
+set autoindent
 
 
 " = key maps
