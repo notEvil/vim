@@ -1,12 +1,10 @@
 " = general
 set nocompatible
 
-if has('win32')
-  let vimfiles = $VIM.'/vimfiles'
-endif
+let configdir = (has('win32') ? $VIM.'/vimfiles' : $HOME.'/.config/nvim')
 
 if has('vim_starting')
-  let &runtimepath.=','.vimfiles.'/dein.vim/'
+  let &runtimepath.=','.configdir.'/dein.vim/'
 endif
 
 
@@ -16,10 +14,9 @@ set background=dark
 colorscheme wombat256mod
 " - fonts
 if has('gui_running')
-  if has('gui_win32')
-    set guifont=Consolas:h11
-  "else
-    "set guifont=Consolas\ 12
+  let font = (has('gui_win32') ? 'Consolas:h11' : (has('gui') ? 'Consolas\ 12' : ''))
+  if font != ''
+    exec 'set guifont='.font
   endif
 endif
 " - cursor
@@ -44,13 +41,14 @@ set guioptions-=l " left scroll bar
 set guioptions-=L
 " - line numbers
 set number
-set relativenumber
 
 
 " = behaviour
 " - session
 set sessionoptions+=resize,winpos " restore size/position of window
 set sessionoptions-=options " do not restore temporary options
+" - line numbers
+set relativenumber
 " - text
 set encoding=utf-8
 set nowrap
@@ -156,14 +154,14 @@ nnoremap Q <nop>
 
 
 " = plugins
-call dein#begin(vimfiles.'/plugins/')
-call dein#add(vimfiles.'/dein.vim/')
+call dein#begin(configdir.'/plugins/')
+call dein#add(configdir.'/dein.vim/')
 
 " - startify
 call dein#add('mhinz/vim-startify')
 let g:startify_list_order = ['sessions', 'files', 'bookmarks']
 let g:startify_bookmarks = [ {'!': $MYVIMRC} ]
-let g:startify_session_dir = vimfiles.'/sessions'
+let g:startify_session_dir = configdir.'/sessions'
 nnoremap <leader>ss :Startify<cr>
 nnoremap <leader>sq :SDelete! temp<cr>:SSave temp<cr>:q!<cr>
 

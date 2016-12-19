@@ -1,21 +1,21 @@
-        normal mode
-
     general
 
 c-q: close
 c-s: save
-up,down,left,right: resize buffer/split
+vv: blockwise visual mode
+-,=: search word under cursor backward,forward
 //: disable search highlights
 R: replace all matches by
--,=: search word under cursor forward,backward
 enter: copy line with linebreak to clipboard
 s-enter: copy line without linebreak to clipboard
 c-c,x: copy,cut to clipboard
 c-v: paste from clipboard
-vv: blockwise visual mode
+s,S: my sneak
+up,down,left,right: resize buffer/split
 ;ss: open startify
 ;sq: save session as "temp" and close vim
-s,S: my sneak
+nerd commenter: ;cc: comment
+                ;cu: uncomment
 
     navigation
 
