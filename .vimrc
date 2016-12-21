@@ -105,6 +105,10 @@ set autoindent
 set backspace=indent
 " - folds
 set foldmethod=indent
+aug _maxfoldlevel
+  au!
+  au Syntax * normal! zR
+aug END
 
 
 " = key maps
