@@ -102,6 +102,9 @@ set expandtab
 set softtabstop=4
 set shiftwidth=4
 set autoindent
+set backspace=indent
+" - folds
+set foldmethod=indent
 
 
 " = key maps
@@ -184,6 +187,13 @@ nnoremap vv <c-v>
 inoremap <silent> <esc> <esc>`^
 " - nop
 nnoremap Q <nop>
+" - folds
+nnoremap zf za
+nnoremap zF zA
+nnoremap zc zm
+nnoremap zo zr
+nnoremap zC zM
+nnoremap zO zR
 
 
 " = plugins
@@ -196,7 +206,7 @@ let g:startify_list_order = ['sessions', 'files', 'bookmarks']
 let g:startify_bookmarks = [ {'!': $MYVIMRC} ]
 let g:startify_session_dir = configdir.'/sessions'
 nnoremap <leader>ss :Startify<cr>
-nnoremap <leader>sq :SDelete! temp<cr>:SSave temp<cr>:q!<cr>
+nnoremap <leader>sq :SDelete! temp<cr>:SSave temp<cr>:qa!<cr>
 
 " - NERD commenter
 call dein#add('scrooloose/nerdcommenter')

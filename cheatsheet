@@ -15,6 +15,12 @@ cs<key><key>: change surround
 ds<key>: delete surround
 is<key>: insert surround (visual)
 up,down,left,right: resize buffer/split
+zf: fold/unfold inner most
+zF: fold/unfold outer most
+zc: increase fold level
+zo: decrease fold level
+zC: close all folds
+zO: open all folds
 ;ss: open startify
 ;sq: save session as "temp" and close vim
 nerd commenter: ;cc: comment
@@ -35,3 +41,7 @@ c-t: clone buffer in new tab
 a-1,2,3,4,5,6,7,8: jump to tab 1,2,3,4,5,6,7,8
 a-9: move tab to the left
 a-0: move tab to the right
+
+    vim base
+
+zd: delete fold
