@@ -11,6 +11,9 @@ s-enter: copy line without linebreak to clipboard
 c-c,x: copy,cut to clipboard
 c-v: paste from clipboard
 s,S: my sneak
+cs<key><key>: change surround
+ds<key>: delete surround
+is<key>: insert surround (visual)
 up,down,left,right: resize buffer/split
 ;ss: open startify
 ;sq: save session as "temp" and close vim

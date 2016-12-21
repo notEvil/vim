@@ -240,6 +240,13 @@ nnoremap gd :YcmCompleter GoTo<cr>
 "nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<cr>
 "inoremap <Nul> <C-n>
 
+" = surround
+call dein#add('tpope/vim-surround')
+let g:surround_no_mappings = 1
+nmap ds <Plug>Dsurround
+nmap cs <Plug>Csurround
+xmap is <Plug>VSurround
+
 call dein#end()
 
 
