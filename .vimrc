@@ -109,6 +109,11 @@ aug _maxfoldlevel
   au!
   au Syntax * normal! zR
 aug END
+" - tpope/vim-sensible
+set nrformats-=octal
+"set display+=lastline " incompatible with sneak
+" - command line
+set wildmenu
 
 
 " = key maps
@@ -147,6 +152,8 @@ nnoremap <c-k> <c-w>l
 " - search
 nnoremap / /\v
 xnoremap / /\v
+nnoremap ? ?\v
+xnoremap ? ?\v
 nnoremap // :nohlsearch<cr>
 nnoremap R :%s///g<left><left>
 xnoremap R :s///g<left><left>
@@ -169,22 +176,17 @@ nnoremap <a-0> :tabmove +1<cr>
 " - copy paste
 nnoremap <cr> "+yyj
 nnoremap <s-cr> m`0"+y$``
-" insert before cursor, cursor moves to the end
-nnoremap p gP
-" insert at the end of line, cursor moves to the entry point of the insertion
-nnoremap P $p`[
-" copy to clipboard, stay in visual mode
-xnoremap <c-c> "+ygv
-" move to clipboard
-xnoremap <c-x> "+ygvd
-" insert clipboard and move to the end
-nnoremap <c-v> "+gP
+nnoremap p gP| " insert before cursor, cursor moves to the end
+cnoremap <c-p> <c-r>"
+nnoremap P $p`[| " insert at the end of line, cursor moves to the entry point of the insertion
+xnoremap <c-c> "+ygv| " copy to clipboard, stay in visual mode
+xnoremap <c-x> "+ygvd| " move to clipboard
+nnoremap <c-v> "+gP| " insert clipboard and move to the end
 " insert clipboard at the end of line, cursor moves to the entry point of the insertion
 "nnoremap <c-s-v> $"+p`[ " doesnt work because c-s-v is equal to c-v
-" insert clipboard, move to the end, stay in insert mode
-inoremap <c-v> <c-R>+
-" replace selection, move to the end
-xnoremap <c-v> d"+gP
+inoremap <c-v> <c-r>+| " insert clipboard, move to the end, stay in insert mode
+xnoremap <c-v> d"+gP| " replace selection, move to the end
+cnoremap <c-v> <c-r>+
 " - visual mode
 nnoremap vv <c-v>
 " - insert mode
@@ -261,10 +263,16 @@ nmap ds <Plug>Dsurround
 nmap cs <Plug>Csurround
 xmap is <Plug>VSurround
 
+" = python syntax
+call dein#add('purpleP/python-syntax')
+let python_highlight_all = 1
+hi link pythonInstanceVariable Identifier
+hi link pythonClassVaraible Identifier
+hi link pythonBoolean Type
+
 call dein#end()
 
 
 " = necessary
 " - dein
 filetype plugin indent on
-syntax enable
