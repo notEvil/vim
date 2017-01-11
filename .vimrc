@@ -232,6 +232,8 @@ let g:sneak#myopt = {
 \ }
 nmap s <Plug>MySneakLabel_s
 nmap S <Plug>MySneakLabel_S
+xmap s <Plug>MySneakLabel_s
+xmap S <Plug>MySneakLabel_S
 
 " = airline
 call dein#add('vim-airline/vim-airline')
@@ -247,6 +249,7 @@ let g:airline_right_sep = ''
 " = ycm
 call dein#add('Valloric/YouCompleteMe')
 nnoremap gd :YcmCompleter GoTo<cr>
+let g:ycm_python_binary_path = 'python3'
 "nnoremap gr :YcmCompleter GoToReferences<cr>
 "let g:ycm_key_list_select_completion = ['<tab>']
 "let g:ycm_key_list_previous_completion = ['<s-tab>']
@@ -269,6 +272,9 @@ let python_highlight_all = 1
 hi link pythonInstanceVariable Identifier
 hi link pythonClassVaraible Identifier
 hi link pythonBoolean Type
+
+" = clever f
+call dein#add('rhysd/clever-f.vim')
 
 call dein#end()
 
