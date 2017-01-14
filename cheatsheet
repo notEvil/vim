@@ -10,11 +10,11 @@ enter: copy line with linebreak to clipboard
 s-enter: copy line without linebreak to clipboard
 c-c,x: copy,cut to clipboard
 c-v: paste from clipboard
-c-p: paste (command line)
+(cmd)c-p: paste
 s,S: my sneak
 cs<key><key>: change surround
 ds<key>: delete surround
-is<key>: insert surround (visual)
+(visual)is<key>: insert surround
 up,down,left,right: resize buffer/split
 zf: fold/unfold inner most
 zF: fold/unfold outer most
@@ -22,6 +22,7 @@ zc: increase fold level
 zo: decrease fold level
 zC: close all folds
 zO: open all folds
+(visual).: apply last operation on each line
 ;ss: open startify
 ;sq: save session as "temp" and close vim
 nerd commenter: ;cc: comment

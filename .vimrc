@@ -102,7 +102,7 @@ set expandtab
 set softtabstop=4
 set shiftwidth=4
 set autoindent
-set backspace=indent
+set backspace=indent,eol
 " - folds
 set foldmethod=indent
 aug _maxfoldlevel
@@ -189,6 +189,7 @@ xnoremap <c-v> d"+gP| " replace selection, move to the end
 cnoremap <c-v> <c-r>+
 " - visual mode
 nnoremap vv <c-v>
+xnoremap . :normal! .<cr>
 " - insert mode
 inoremap <silent> <esc> <esc>`^
 " - nop
@@ -275,6 +276,7 @@ hi link pythonBoolean Type
 
 " = clever f
 call dein#add('rhysd/clever-f.vim')
+
 
 call dein#end()
 
