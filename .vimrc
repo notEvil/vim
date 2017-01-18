@@ -157,10 +157,10 @@ xnoremap ? ?\v
 nnoremap // :nohlsearch<cr>
 nnoremap R :%s///g<left><left>
 xnoremap R :s///g<left><left>
-nnoremap = *
-xnoremap = *
 nnoremap - #
-xnoremap - #
+nnoremap = *
+xnoremap - ""y?\V<c-r>=escape(@", '\/')<cr><cr>gn
+xnoremap = ""y/\V<c-r>=escape(@", '\/')<cr><cr>gn
 " - tabs
 nnoremap <c-t> :tab split<cr>
 nnoremap <a-1> 1gt
