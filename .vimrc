@@ -85,6 +85,13 @@ set relativenumber
 set encoding=utf-8
 set nowrap
 syntax on
+" - input
+set backspace=indent,eol
+" - indent
+set expandtab
+set softtabstop=4
+set shiftwidth=4
+set autoindent
 " - search
 set ignorecase
 set smartcase
@@ -97,12 +104,6 @@ set incsearch
 " - buffer
 set splitbelow
 set splitright
-" - indent
-set expandtab
-set softtabstop=4
-set shiftwidth=4
-set autoindent
-set backspace=indent,eol
 " - folds
 set foldmethod=indent
 aug _maxfoldlevel
@@ -128,10 +129,6 @@ nnoremap <left> 5<c-w><
 nnoremap <right> 5<c-w>>
 " - navigation
 " . inside buffer
-nnoremap <space> <c-d>
-xnoremap <space> <c-d>
-nnoremap <s-space> <c-u>
-xnoremap <s-space> <c-u>
 nnoremap <a-h> h
 xnoremap <a-h> h
 nnoremap <a-n> j
@@ -142,6 +139,10 @@ nnoremap <a-i> l
 xnoremap <a-i> l
 nnoremap # ^
 xnoremap # ^
+nnoremap <space> <c-d>
+xnoremap <space> <c-d>
+nnoremap <s-space> <c-u>
+xnoremap <s-space> <c-u>
 nnoremap <c-i> <c-o>
 nnoremap <c-o> <c-i>
 " . between buffer
@@ -150,6 +151,10 @@ nnoremap <c-n> <c-w>j
 nnoremap <c-e> <c-w>k
 nnoremap <c-k> <c-w>l
 " - search
+nnoremap - #
+nnoremap = *
+xnoremap - ""y?\V<c-r>=escape(@", '\/')<cr><cr>gn
+xnoremap = ""y/\V<c-r>=escape(@", '\/')<cr><cr>gn
 nnoremap / /\v
 xnoremap / /\v
 nnoremap ? ?\v
@@ -157,10 +162,6 @@ xnoremap ? ?\v
 nnoremap // :nohlsearch<cr>
 nnoremap R :%s///g<left><left>
 xnoremap R :s///g<left><left>
-nnoremap - #
-nnoremap = *
-xnoremap - ""y?\V<c-r>=escape(@", '\/')<cr><cr>gn
-xnoremap = ""y/\V<c-r>=escape(@", '\/')<cr><cr>gn
 " - tabs
 nnoremap <c-t> :tab split<cr>
 nnoremap <a-1> 1gt
@@ -174,17 +175,16 @@ nnoremap <a-8> 8gt
 nnoremap <a-9> :tabmove -1<cr>
 nnoremap <a-0> :tabmove +1<cr>
 " - copy paste
+nnoremap p gP| " insert before cursor, cursor moves to the end
+nnoremap P $p`[| " insert at the end of line, cursor moves to the entry point of the insertion
+cnoremap <c-p> <c-r>"
 nnoremap <cr> "+yyj
 nnoremap <s-cr> m`0"+y$``
-nnoremap p gP| " insert before cursor, cursor moves to the end
-cnoremap <c-p> <c-r>"
-nnoremap P $p`[| " insert at the end of line, cursor moves to the entry point of the insertion
 xnoremap <c-c> "+ygv| " copy to clipboard, stay in visual mode
-xnoremap <c-x> "+ygvd| " move to clipboard
-nnoremap <c-v> "+gP| " insert clipboard and move to the end
-" insert clipboard at the end of line, cursor moves to the entry point of the insertion
-"nnoremap <c-s-v> $"+p`[ " doesnt work because c-s-v is equal to c-v
-inoremap <c-v> <c-r>+| " insert clipboard, move to the end, stay in insert mode
+xnoremap <c-x> "+ygvd| " cut to clipboard
+nnoremap <c-v> "+gP| " paste from clipboard and move to the end
+"nnoremap <c-s-v> $"+p`[| " paste from clipboard at the end of line, cursor moves to the entry point of the insertion; doesnt work because c-s-v is equal to c-v
+inoremap <c-v> <c-r>+| " paste from clipboard, move to the end, stay in insert mode
 xnoremap <c-v> d"+gP| " replace selection, move to the end
 cnoremap <c-v> <c-r>+
 " - visual mode

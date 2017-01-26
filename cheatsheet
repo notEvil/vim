@@ -1,39 +1,27 @@
+
     general
 
 c-q: close
 c-s: save
-vv: blockwise visual mode
+up,down,left,right: resize buffer/split
 -,=: search word under cursor backward,forward
 //: disable search highlights
 R: replace all matches by
+(cmd)c-p: paste
 enter: copy line with linebreak to clipboard
 s-enter: copy line without linebreak to clipboard
 c-c,x: copy,cut to clipboard
 c-v: paste from clipboard
-(cmd)c-p: paste
-s,S: my sneak
-cs<key><key>: change surround
-ds<key>: delete surround
-(visual)is<key>: insert surround
-up,down,left,right: resize buffer/split
-zf: fold/unfold inner most
-zF: fold/unfold outer most
-zc: increase fold level
-zo: decrease fold level
-zC: close all folds
-zO: open all folds
+vv: blockwise visual mode
 (visual).: apply last operation on each line
-;ss: open startify
-;sq: save session as "temp" and close vim
-nerd commenter: ;cc: comment
-                ;cu: uncomment
 
     navigation
 
-space: page down
-s-space: page up
 a-h,n,e,i: move cursor by 1
 #,$: move cursor to start,end of line
+s,S: my sneak
+space: page down
+s-space: page up
 c-i,o: jump backward,forward in jump history
 c-h,n,e,k: jump to buffer to the left,bottom,top,right
 
@@ -44,6 +32,29 @@ a-1,2,3,4,5,6,7,8: jump to tab 1,2,3,4,5,6,7,8
 a-9: move tab to the left
 a-0: move tab to the right
 
+    folds
+
+zf: fold/unfold inner most
+zF: fold/unfold outer most
+zc: increase fold level
+zo: decrease fold level
+zC: close all folds
+zO: open all folds
+
+    plugins
+
+startify: ;ss: open startify
+          ;sq: save session as "temp" and close vim
+
+nerd commenter: ;cc: comment
+                ;cu: uncomment
+
+surround: cs<key><key>: change surround
+          ds<key>: delete surround
+          (visual)is<key>: insert surround
+
     vim base
 
+gd: goto definition
 zd: delete fold
+
